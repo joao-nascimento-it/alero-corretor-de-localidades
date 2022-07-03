@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "importMap": "import_map.json"
+}
