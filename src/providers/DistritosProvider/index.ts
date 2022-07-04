@@ -1,5 +1,5 @@
 import { createQueryAllDistritos } from "./DistritosProvider.ts";
-import { fetchDistritos } from "./fetchDistritos.ts";
+import { fetchDistritos } from "./fetchDistritos/index.ts";
 
 const databaseResult = await fetchDistritos();
 
