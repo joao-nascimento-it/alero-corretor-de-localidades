@@ -1,5 +1,5 @@
+import { assertEquals, assertStrictEquals } from "@deps/asserts.ts";
 import { Result } from "./Result.ts";
-import { assertEquals, assertStrictEquals } from "std/testing/asserts.ts";
 
 Deno.test("Result", () => {
   const doneResult = Result.done("Some success");
