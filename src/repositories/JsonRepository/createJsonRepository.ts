@@ -16,7 +16,10 @@ export function createQueryAllItems<T>(
 ): QueryAllItems<T> {
   return async () => {
     const data = await safeReadJson(path);
-    const dataResult = await arraySchema.safeParseAsync(data);
+    if (data.isFail()) {
+      return data;
+    }
+    const dataResult = await arraySchema.safeParseAsync(data.value);
 
     if (!dataResult.success) {
       return Result.fail(dataResult.error);
