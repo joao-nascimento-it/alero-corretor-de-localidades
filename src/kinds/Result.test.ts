@@ -1,4 +1,4 @@
-import { assertEquals, assertStrictEquals } from "@deps/asserts.ts";
+import { assertEquals, assertStrictEquals } from "@src/deps.ts";
 import { Result } from "./Result.ts";
 
 Deno.test("Result", () => {
@@ -7,7 +7,7 @@ Deno.test("Result", () => {
   assertStrictEquals(doneResult.value, "Some success");
 });
 
-Deno.test("Result", () => {
+Deno.test("Result type Done", () => {
   const result = Result.done("Success");
 
   assertStrictEquals(result.isDone(), true);
@@ -15,7 +15,7 @@ Deno.test("Result", () => {
   assertStrictEquals(result.value, "Success");
 });
 
-Deno.test("Result", () => {
+Deno.test("Result type Fail", () => {
   const result = Result.fail("Failure");
 
   assertStrictEquals(result.isDone(), false);
