@@ -6,7 +6,7 @@ import {
   createInsertItem,
   createQueryAllItems,
   createQueryFirstItem,
-} from "./FakeJsonRepository.ts";
+} from "./createFakeJsonRepository.ts";
 
 Deno.test("FakeJsonRepository should query All", async () => {
   const queryAllItems = createQueryAllItems(["Item"]);

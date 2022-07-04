@@ -7,11 +7,6 @@ import {
   QueryFirstItem,
 } from "./IJsonRepository.ts";
 
-class FakeJsonRepository<T> {
-  constructor(readonly database: T[]) {
-  }
-}
-
 export function createQueryAllItems<T>(database: T[]): QueryAllItems<T> {
   return async () => {
     return await Result.done(database);

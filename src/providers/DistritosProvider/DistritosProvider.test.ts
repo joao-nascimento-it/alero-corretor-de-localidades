@@ -1,5 +1,5 @@
 import { assertEquals, assertObjectMatch } from "@src/deps.ts";
-import { createQueryAllDistritos } from "./DistritosProvider.ts";
+import { createQueryAllDistritos } from "./createDistritosProvider.ts";
 
 Deno.test("Distrito Provider", async () => {
   const queryAllDistritos = createQueryAllDistritos([{
