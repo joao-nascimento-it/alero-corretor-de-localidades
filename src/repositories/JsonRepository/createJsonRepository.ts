@@ -2,7 +2,7 @@ import { Result } from "../../kinds/Result.ts";
 
 import { z } from "@src/deps.ts";
 import { QueryAllItems } from "./IJsonRepository.ts";
-import { SafeReadJson } from "@src/shared/JsonUtils/safeReadJson/ISafeReadJson.ts";
+import { SafeReadJson } from "@src/shared/safeReadJson/ISafeReadJson.ts";
 
 type CreateQueryAllItemsDeps = Readonly<{
   path: string;
