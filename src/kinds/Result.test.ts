@@ -8,31 +8,17 @@ Deno.test("Result", () => {
 });
 
 Deno.test("Result", () => {
-  const doneResult = Result.done("Some success");
+  const result = Result.done("Success");
 
-  assertStrictEquals(doneResult.isDone(), true);
+  assertStrictEquals(result.isDone(), true);
+  assertStrictEquals(result.isFail(), false);
+  assertStrictEquals(result.value, "Success");
 });
 
 Deno.test("Result", () => {
-  const doneResult = Result.done("Some success");
+  const result = Result.fail("Failure");
 
-  assertStrictEquals(doneResult.isFail(), false);
-});
-
-Deno.test("Result", () => {
-  const failResult = Result.fail("Some failure");
-
-  assertStrictEquals(failResult.value, "Some failure");
-});
-
-Deno.test("Result", () => {
-  const failResult = Result.fail("Some failure");
-
-  assertStrictEquals(failResult.isDone(), false);
-});
-
-Deno.test("Result", () => {
-  const failResult = Result.fail("Some failure");
-
-  assertStrictEquals(failResult.isFail(), true);
+  assertStrictEquals(result.isDone(), false);
+  assertStrictEquals(result.isFail(), true);
+  assertStrictEquals(result.value, "Failure");
 });
