@@ -1,4 +1,4 @@
-import { assertEquals, assertObjectMatch } from "@deps/asserts.ts";
+import { assertEquals, assertObjectMatch } from "@src/deps.ts";
 import { Result } from "../../kinds/Result.ts";
 
 import {

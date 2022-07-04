@@ -1,4 +1,4 @@
-import { z } from "@deps/zod.ts";
+import { z } from "@src/deps.ts";
 import { Result } from "../../kinds/Result.ts";
 import { Distrito, Distritos } from "../../models/Distrito.ts";
 
