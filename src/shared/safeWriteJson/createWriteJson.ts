@@ -5,9 +5,9 @@ interface CreateSafeWriteJsonDeps {
   writeTextFile(path: string | URL, data: string): Promise<void>;
 }
 
-export function createSafeWriteJson(
-  { writeTextFile }: CreateSafeWriteJsonDeps,
-): SafeWriteJson {
+export function createSafeWriteJson({
+  writeTextFile,
+}: CreateSafeWriteJsonDeps): SafeWriteJson {
   return async (path, data) => {
     try {
       const file = JSON.stringify(data);
