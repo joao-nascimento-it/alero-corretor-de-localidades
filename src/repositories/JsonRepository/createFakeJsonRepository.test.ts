@@ -1,4 +1,4 @@
-import { assertEquals, assertObjectMatch } from "@src/deps.ts";
+import { assertEquals } from "@src/deps.ts";
 import { Result } from "../../kinds/Result.ts";
 
 import {
@@ -12,12 +12,7 @@ Deno.test("FakeJsonRepository should query All", async () => {
   const queryAllItems = createQueryAllItems(["Item"]);
 
   const items = await queryAllItems();
-
-  assertObjectMatch({
-    items,
-  }, {
-    items: Result.done(["Item"]),
-  });
+  assertEquals(items, Result.done(["Item"]));
 });
 
 Deno.test("FakeJsonRepository should insert", async () => {
@@ -26,15 +21,8 @@ Deno.test("FakeJsonRepository should insert", async () => {
 
   const item = await insertItem("World");
 
-  assertObjectMatch({
-    item,
-  }, {
-    item: Result.done("World"),
-  });
-
-  assertObjectMatch({
-    database,
-  }, { database: ["Hello", "World"] });
+  assertEquals(item, Result.done("World"));
+  assertEquals(database, ["Hello", "World"]);
 });
 
 Deno.test("FakeJsonRepository should queryFirstItem", async () => {
@@ -42,11 +30,7 @@ Deno.test("FakeJsonRepository should queryFirstItem", async () => {
 
   const item = await queryFirstItem();
 
-  assertObjectMatch({
-    item,
-  }, {
-    item: Result.done("Hello"),
-  });
+  assertEquals(item, Result.done("Hello"));
 });
 
 Deno.test("FakeJsonRepository should delete item", async () => {
@@ -55,14 +39,6 @@ Deno.test("FakeJsonRepository should delete item", async () => {
 
   const result = await deleteFirstItem();
 
-  assertObjectMatch({
-    result,
-  }, {
-    result: Result.done(undefined),
-  });
-  assertObjectMatch({
-    database,
-  }, {
-    database: [],
-  });
+  assertEquals(result, Result.done(undefined));
+  assertEquals(database, []);
 });

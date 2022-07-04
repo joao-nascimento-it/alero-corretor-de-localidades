@@ -1,4 +1,4 @@
-import { assertEquals, assertStrictEquals } from "@src/deps.ts";
+import { assertEquals } from "@src/deps.ts";
 import { Result } from "@src/kinds/Result.ts";
 import { createSafeWriteJson } from "./createWriteJson.ts";
 

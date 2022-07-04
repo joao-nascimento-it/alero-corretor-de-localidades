@@ -1,4 +1,4 @@
-import { assertEquals, assertObjectMatch } from "@src/deps.ts";
+import { assertEquals } from "@src/deps.ts";
 import { createQueryAllDistritos } from "./createDistritosProvider.ts";
 
 Deno.test("Distrito Provider", async () => {
@@ -13,16 +13,12 @@ Deno.test("Distrito Provider", async () => {
 
   const distritos = await queryAllDistritos();
 
-  assertObjectMatch({
-    distritos,
-  }, {
-    distritos: [{
-      "distrito-id": "110020505",
-      "distrito-nome": "Porto Velho",
-      "municipio-id": "1100205",
-      "municipio-nome": "Porto Velho",
-      "UF-id": "11",
-      "UF-sigla": "RO",
-    }],
-  });
+  assertEquals(distritos, [{
+    "distrito-id": "110020505",
+    "distrito-nome": "Porto Velho",
+    "municipio-id": "1100205",
+    "municipio-nome": "Porto Velho",
+    "UF-id": "11",
+    "UF-sigla": "RO",
+  }]);
 });

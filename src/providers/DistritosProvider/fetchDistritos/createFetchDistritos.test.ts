@@ -1,4 +1,4 @@
-import { assertEquals, assertObjectMatch } from "@src/deps.ts";
+import { assertEquals } from "@src/deps.ts";
 import { Result } from "@src/kinds/Result.ts";
 import { Distritos } from "../../../models/Distrito.ts";
 import { createFetchDistritos } from "./createFetchDistritos.ts";
@@ -36,6 +36,8 @@ Deno.test("createFetchDistritos should fetch distritos", async () => {
       return Response.json(distritosJsonBody);
     },
   });
+
   const distritosResult = await fetchDistritos();
+
   assertEquals(distritosResult, Result.done(distritos));
 });
