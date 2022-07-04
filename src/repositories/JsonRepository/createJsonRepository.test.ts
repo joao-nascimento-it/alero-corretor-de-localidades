@@ -1,5 +1,6 @@
 import { assertEquals } from "@src/deps.ts";
 import { Result } from "../../kinds/Result.ts";
+import { SafeReadJson } from "../../shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "../../shared/safeWriteJson/ISafeWriteJson.ts";
 
 import {
@@ -8,13 +9,11 @@ import {
 } from "./createJsonRepository.ts";
 
 Deno.test("FakeJsonRepository should query All", async () => {
+  const database = new FakeDatabase(["Item"]);
+
   const queryAllItems = createQueryAllItems({
     path: "file.json",
-    async safeReadJson(path) {
-      assertEquals(path, "file.json");
-
-      return await Result.done(["Item"]);
-    },
+    safeReadJson: FakeDatabase.createFakeSafeReadJson(database),
   });
 
   const items = await queryAllItems();
@@ -23,38 +22,41 @@ Deno.test("FakeJsonRepository should query All", async () => {
 });
 
 Deno.test("FakeJsonRepository should insert item", async () => {
-  let database: string[] = [];
-
+  //let database: string[] = [];
+  const database = new FakeDatabase([]);
   const insertItem = createInsertItem({
     path: "file.json",
-    async safeReadJson(path) {
-      await Promise.resolve();
-      assertEquals(path, "file.json");
-      return Result.done(database);
-    },
-    async safeWriteJson(path, data) {
-      await Promise.resolve();
-      assertEquals(path, "file.json");
-      database = data;
-      return Result.done(undefined);
-    },
+    safeReadJson: FakeDatabase.createFakeSafeReadJson(database),
+    safeWriteJson: FakeDatabase.createFakeSafeWriteJson(database),
   });
 
   const result = await insertItem("Item");
 
   assertEquals(result, Result.done("Item"));
 
-  assertEquals(database, ["Item"]);
+  assertEquals(database.array, ["Item"]);
 });
 
-const createFakeSafeWriteJson = ({
-  database,
-}: {
-  database: any[];
-}): SafeWriteJson =>
-  async (path, data) => {
-    await Promise.resolve();
-    assertEquals(path, "file.json");
-    database = data;
-    return Result.done(undefined);
-  };
+class FakeDatabase<T> {
+  constructor(public array: T[]) {
+  }
+
+  static createFakeSafeWriteJson = <T>(
+    database: FakeDatabase<T>,
+  ): SafeWriteJson =>
+    async (path, data) => {
+      await Promise.resolve();
+      assertEquals(path, "file.json");
+      database.array = data;
+      return Result.done(undefined);
+    };
+
+  static createFakeSafeReadJson = <T>(
+    database: FakeDatabase<T>,
+  ): SafeReadJson =>
+    async (path) => {
+      await Promise.resolve();
+      assertEquals(path, "file.json");
+      return Result.done(database.array);
+    };
+}
