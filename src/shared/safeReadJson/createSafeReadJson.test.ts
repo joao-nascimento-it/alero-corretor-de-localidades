@@ -1,4 +1,4 @@
-import { assertEquals, assertObjectMatch } from "@src/deps.ts";
+import { assertEquals } from "@src/deps.ts";
 import { Result } from "@src/kinds/Result.ts";
 import { createSafeReadJson } from "./createSafeReadJson.ts";
 
