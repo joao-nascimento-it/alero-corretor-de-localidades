@@ -1,17 +1,18 @@
 import { Result } from "../../kinds/Result.ts";
-import { safeReadJson } from "@src/shared/JsonUtils/readJson.ts";
 
 import { z } from "@src/deps.ts";
 import { QueryAllItems } from "./IJsonRepository.ts";
+import { SafeReadJson } from "@src/shared/JsonUtils/safeReadJson/ISafeReadJson.ts";
 
-type FakeJsonDeps = Readonly<{
+type CreateQueryAllItemsDeps = Readonly<{
   path: string;
+  safeReadJson: SafeReadJson;
 }>;
 
 const arraySchema = z.array(z.unknown());
 
 export function createQueryAllItems<T>(
-  { path }: FakeJsonDeps,
+  { path, safeReadJson }: CreateQueryAllItemsDeps,
 ): QueryAllItems<T> {
   return async () => {
     const data = await safeReadJson(path);
