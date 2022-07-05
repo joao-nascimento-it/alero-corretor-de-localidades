@@ -4,6 +4,7 @@ import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 
 import {
+  createDeleteFirstItem,
   createInsertItem,
   createQueryAllItems,
   createQueryFirstItem,
@@ -20,6 +21,7 @@ Deno.test("FakeJsonRepository should query All", async () => {
   const items = await queryAllItems();
 
   assertEquals(items, Result.done(["Item"]));
+  assertEquals(database.array, ["Item"]);
 });
 
 Deno.test("JsonRepository should insert item", async () => {
@@ -48,6 +50,7 @@ Deno.test("JsonRepository should query first item", async () => {
   const itemResult = await queryFirstItem();
 
   assertEquals(itemResult, Result.done("Item"));
+  assertEquals(database.array, ["Item"]);
 });
 
 class FakeDatabase<T> {
@@ -73,3 +76,18 @@ class FakeDatabase<T> {
       return Result.done(database.array);
     };
 }
+
+Deno.test("JsonRepository should query first item", async () => {
+  const database = new FakeDatabase(["Item"]);
+
+  const deleteFirstItem = createDeleteFirstItem({
+    path: "file.json",
+    safeReadJson: FakeDatabase.createFakeSafeReadJson(database),
+    safeWriteJson: FakeDatabase.createFakeSafeWriteJson(database),
+  });
+
+  const result = await deleteFirstItem();
+
+  assertEquals(result, Result.done(undefined));
+  assertEquals(database.array, []);
+});
