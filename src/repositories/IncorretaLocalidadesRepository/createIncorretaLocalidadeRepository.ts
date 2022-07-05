@@ -28,7 +28,7 @@ const createIncorretasLocalidadesValidator = (): JsonRepositoryValidator<
     return Result.done(parsedData.data);
   };
 
-export const createIncorretaLocalidadesRepository = ({
+export const createQueryAllIncorretaLocalidades = ({
   path,
   safeReadJson,
 }: {

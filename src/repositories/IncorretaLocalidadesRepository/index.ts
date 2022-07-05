@@ -1,8 +1,7 @@
 import { safeReadJson } from "@/shared/safeReadJson/index.ts";
-import { createIncorretaLocalidadesRepository } from "./createIncorretaLocalidadeRepository.ts";
+import { createQueryAllIncorretaLocalidades } from "./createIncorretaLocalidadeRepository.ts";
 
-export const incorretaLocalidadesRepository =
-  createIncorretaLocalidadesRepository({
-    path: "./private/incorretos.json",
-    safeReadJson,
-  });
+export const queryAllIncorretaLocalidades = createQueryAllIncorretaLocalidades({
+  path: "./private/incorretos.json",
+  safeReadJson,
+});
