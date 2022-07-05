@@ -1,12 +1,13 @@
 import { z } from "@/deps.ts";
 import { Result } from "@/kinds/Result.ts";
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
-
+import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
+  createInsertItem,
   createQueryAllItems,
   createQueryFirstItem,
   JsonRepositoryValidator,
-} from "../JsonRepository/createJsonRepository.ts";
+} from "@/repositories/JsonRepository/createJsonRepository.ts";
 
 const LocalidadesSchema = z.array(z.object({
   municipio: z.string(),
@@ -57,5 +58,22 @@ export function createQueryFirstLocalidade({
     path,
     safeReadJson,
     validate,
+  });
+}
+
+export function createInsertLocalidade({
+  path,
+  safeReadJson,
+  safeWriteJson,
+}: {
+  path: string;
+  safeReadJson: SafeReadJson;
+  safeWriteJson: SafeWriteJson;
+}) {
+  return createInsertItem({
+    path,
+    safeReadJson,
+    validate,
+    safeWriteJson,
   });
 }
