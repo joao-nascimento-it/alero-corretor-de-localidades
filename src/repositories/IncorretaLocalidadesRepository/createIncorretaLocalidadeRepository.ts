@@ -1,6 +1,6 @@
 import { z } from "@/deps.ts";
 import { Result } from "@/kinds/Result.ts";
-import { SafeReadJson } from "../../shared/safeReadJson/ISafeReadJson.ts";
+import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import {
   createQueryAllItems,
   createQueryFirstItem,
