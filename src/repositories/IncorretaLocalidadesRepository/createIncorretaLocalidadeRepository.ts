@@ -3,6 +3,7 @@ import { Result } from "@/kinds/Result.ts";
 import { SafeReadJson } from "../../shared/safeReadJson/ISafeReadJson.ts";
 import {
   createQueryAllItems,
+  createQueryFirstItem,
   JsonRepositoryValidator,
 } from "../JsonRepository/createJsonRepository.ts";
 
@@ -28,15 +29,32 @@ const createIncorretasLocalidadesValidator = (): JsonRepositoryValidator<
     return Result.done(parsedData.data);
   };
 
-export const createQueryAllIncorretaLocalidades = ({
+const validate = createIncorretasLocalidadesValidator();
+
+export function createQueryAllIncorretaLocalidades({
   path,
   safeReadJson,
 }: {
   path: string;
   safeReadJson: SafeReadJson;
-}) =>
-  createQueryAllItems({
+}) {
+  return createQueryAllItems({
     path,
     safeReadJson,
-    validate: createIncorretasLocalidadesValidator(),
+    validate,
   });
+}
+
+export function createQueryFirstIncorretaLocalidade({
+  path,
+  safeReadJson,
+}: {
+  path: string;
+  safeReadJson: SafeReadJson;
+}) {
+  return createQueryFirstItem({
+    path,
+    safeReadJson,
+    validate,
+  });
+}
