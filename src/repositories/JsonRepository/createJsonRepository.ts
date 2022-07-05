@@ -3,6 +3,7 @@ import { z } from "@/deps.ts";
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
+  DeleteFirstItem,
   InsertItem,
   QueryAllItems,
   QueryFirstItem,
@@ -67,9 +68,10 @@ interface CreateQueryFirstItemDeps<T> {
   safeReadJson: SafeReadJson;
 }
 
-export const createQueryFirstItem = <T>(
-  { path, safeReadJson }: CreateQueryFirstItemDeps<T>,
-): QueryFirstItem<T> =>
+export const createQueryFirstItem = <T>({
+  path,
+  safeReadJson,
+}: CreateQueryFirstItemDeps<T>): QueryFirstItem<T> =>
   async () => {
     const queryAllItems = createQueryAllItems<T>({ path, safeReadJson });
 
@@ -83,4 +85,29 @@ export const createQueryFirstItem = <T>(
     }
 
     return Result.done(head);
+  };
+
+interface CreateDeleteFirstItemDeps {
+  path: string;
+  safeReadJson: SafeReadJson;
+  safeWriteJson: SafeWriteJson;
+}
+
+export const createDeleteFirstItem = ({
+  path,
+  safeReadJson,
+  safeWriteJson,
+}: CreateDeleteFirstItemDeps): DeleteFirstItem =>
+  async () => {
+    const queryAllItems = createQueryAllItems({ path, safeReadJson });
+
+    const itemsResult = await queryAllItems();
+    if (itemsResult.isFail()) return itemsResult;
+
+    const [head, ...tail] = itemsResult.value;
+
+    const result = await safeWriteJson(path, tail);
+    if (result.isFail()) return result;
+
+    return Result.done(undefined);
   };
