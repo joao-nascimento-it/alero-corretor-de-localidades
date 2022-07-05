@@ -22,7 +22,7 @@ Deno.test("FakeJsonRepository should query All", async () => {
   assertEquals(items, Result.done(["Item"]));
 });
 
-Deno.test("FakeJsonRepository should insert item", async () => {
+Deno.test("JsonRepository should insert item", async () => {
   const database = new FakeDatabase([]);
 
   const insertItem = createInsertItem({
