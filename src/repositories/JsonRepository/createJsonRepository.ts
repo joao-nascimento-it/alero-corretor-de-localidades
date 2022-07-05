@@ -1,7 +1,11 @@
 import { Result } from "../../kinds/Result.ts";
 
 import { z } from "@src/deps.ts";
-import { InsertItem, QueryAllItems } from "./IJsonRepository.ts";
+import {
+  InsertItem,
+  QueryAllItems,
+  QueryFirstItem,
+} from "./IJsonRepository.ts";
 import { SafeReadJson } from "@src/shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "../../shared/safeWriteJson/ISafeWriteJson.ts";
 
@@ -57,4 +61,26 @@ export const createInsertItem = <T>({
     if (result.isFail()) return result;
 
     return Result.done(item);
+  };
+
+interface CreateQueryFirstItemDeps<T> {
+  path: string;
+  safeReadJson: SafeReadJson;
+}
+export const createQueryFirstItem = <T>(
+  { path, safeReadJson }: CreateQueryFirstItemDeps<T>,
+): QueryFirstItem<T> =>
+  async () => {
+    const queryAllItems = createQueryAllItems<T>({ path, safeReadJson });
+
+    const itemsResult = await queryAllItems();
+    if (itemsResult.isFail()) return itemsResult;
+
+    const [head] = itemsResult.value;
+
+    if (!head) {
+      return Result.fail(undefined);
+    }
+
+    return Result.done(head);
   };
