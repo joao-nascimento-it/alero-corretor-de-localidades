@@ -1,5 +1,4 @@
 import { Result } from "@/kinds/Result.ts";
-import { z } from "@/deps.ts";
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
@@ -9,53 +8,57 @@ import {
   QueryFirstItem,
 } from "./IJsonRepository.ts";
 
-type CreateQueryAllItemsDeps = Readonly<{
+export type JsonRepositoryValidator<T> = (
+  item: unknown,
+) => Promise<Result<readonly T[], Error>>;
+
+type CreateQueryAllItemsDeps<T> = Readonly<{
   path: string;
   safeReadJson: SafeReadJson;
+  validate: JsonRepositoryValidator<T>;
 }>;
-
-const arraySchema = z.array(z.unknown());
 
 export const createQueryAllItems = <T>({
   path,
   safeReadJson,
-}: CreateQueryAllItemsDeps): QueryAllItems<T> =>
+  validate,
+}: CreateQueryAllItemsDeps<T>): QueryAllItems<T> =>
   async () => {
     const data = await safeReadJson(path);
-    if (data.isFail()) {
-      return data;
-    }
-    const dataResult = await arraySchema.safeParseAsync(data.value);
 
-    if (!dataResult.success) {
-      return Result.fail(dataResult.error);
-    }
+    if (data.isFail()) return data;
 
-    return Result.done(dataResult.data as T[]);
+    const validatorResult = await validate(data.value);
+
+    if (validatorResult.isFail()) return validatorResult;
+
+    return Result.done(validatorResult.value);
   };
 
-interface CreateInsertItemDeps {
+interface CreateInsertItemDeps<T> {
   readonly path: string;
   safeReadJson: SafeReadJson;
   safeWriteJson: SafeWriteJson;
+  validate: JsonRepositoryValidator<T>;
 }
 
 export const createInsertItem = <T>({
   path,
   safeReadJson,
   safeWriteJson,
-}: CreateInsertItemDeps): InsertItem<T> =>
+  validate,
+}: CreateInsertItemDeps<T>): InsertItem<T> =>
   async (item) => {
     const data = await safeReadJson(path);
     if (data.isFail()) return data;
 
-    const dataResult = await arraySchema.safeParseAsync(data.value);
+    const validatedResult = await validate(data.value);
 
-    if (!dataResult.success) {
-      return Result.fail(dataResult.error);
+    if (validatedResult.isFail()) {
+      return validatedResult;
     }
 
-    const database = dataResult.data;
+    const database = validatedResult.value;
 
     const result = await safeWriteJson(path, [item, ...database]);
     if (result.isFail()) return result;
@@ -66,14 +69,20 @@ export const createInsertItem = <T>({
 interface CreateQueryFirstItemDeps<T> {
   path: string;
   safeReadJson: SafeReadJson;
+  validate: JsonRepositoryValidator<T>;
 }
 
 export const createQueryFirstItem = <T>({
   path,
   safeReadJson,
+  validate,
 }: CreateQueryFirstItemDeps<T>): QueryFirstItem<T> =>
   async () => {
-    const queryAllItems = createQueryAllItems<T>({ path, safeReadJson });
+    const queryAllItems = createQueryAllItems<T>({
+      path,
+      safeReadJson,
+      validate,
+    });
 
     const itemsResult = await queryAllItems();
     if (itemsResult.isFail()) return itemsResult;
@@ -87,19 +96,21 @@ export const createQueryFirstItem = <T>({
     return Result.done(head);
   };
 
-interface CreateDeleteFirstItemDeps {
+interface CreateDeleteFirstItemDeps<T> {
   path: string;
   safeReadJson: SafeReadJson;
   safeWriteJson: SafeWriteJson;
+  validate: JsonRepositoryValidator<T>;
 }
 
-export const createDeleteFirstItem = ({
+export const createDeleteFirstItem = <T>({
   path,
   safeReadJson,
   safeWriteJson,
-}: CreateDeleteFirstItemDeps): DeleteFirstItem =>
+  validate,
+}: CreateDeleteFirstItemDeps<T>): DeleteFirstItem<T> =>
   async () => {
-    const queryAllItems = createQueryAllItems({ path, safeReadJson });
+    const queryAllItems = createQueryAllItems({ path, safeReadJson, validate });
 
     const itemsResult = await queryAllItems();
     if (itemsResult.isFail()) return itemsResult;

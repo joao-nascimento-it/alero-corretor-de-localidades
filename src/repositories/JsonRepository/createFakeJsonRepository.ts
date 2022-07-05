@@ -28,7 +28,7 @@ export function createQueryFirstItem<T>(database: T[]): QueryFirstItem<T> {
   };
 }
 
-export function createDeleteFirstItem<T>(database: T[]): DeleteFirstItem {
+export function createDeleteFirstItem<T>(database: T[]): DeleteFirstItem<T> {
   return async () => {
     database.shift();
     return await Result.done(undefined);
