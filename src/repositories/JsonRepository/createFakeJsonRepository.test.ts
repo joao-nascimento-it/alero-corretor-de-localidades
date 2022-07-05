@@ -1,5 +1,5 @@
-import { assertEquals } from "@src/deps.ts";
-import { Result } from "../../kinds/Result.ts";
+import { assertEquals } from "@/deps.ts";
+import { Result } from "@/kinds/Result.ts";
 
 import {
   createDeleteFirstItem,

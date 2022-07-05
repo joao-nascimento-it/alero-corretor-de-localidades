@@ -1,13 +1,12 @@
-import { Result } from "../../kinds/Result.ts";
-
-import { z } from "@src/deps.ts";
+import { Result } from "@/kinds/Result.ts";
+import { z } from "@/deps.ts";
+import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
+import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
   InsertItem,
   QueryAllItems,
   QueryFirstItem,
 } from "./IJsonRepository.ts";
-import { SafeReadJson } from "@src/shared/safeReadJson/ISafeReadJson.ts";
-import { SafeWriteJson } from "../../shared/safeWriteJson/ISafeWriteJson.ts";
 
 type CreateQueryAllItemsDeps = Readonly<{
   path: string;
@@ -67,6 +66,7 @@ interface CreateQueryFirstItemDeps<T> {
   path: string;
   safeReadJson: SafeReadJson;
 }
+
 export const createQueryFirstItem = <T>(
   { path, safeReadJson }: CreateQueryFirstItemDeps<T>,
 ): QueryFirstItem<T> =>

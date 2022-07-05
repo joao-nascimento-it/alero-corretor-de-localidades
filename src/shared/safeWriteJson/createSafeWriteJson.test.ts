@@ -1,5 +1,5 @@
-import { assertEquals } from "@src/deps.ts";
-import { Result } from "@src/kinds/Result.ts";
+import { assertEquals } from "@/deps.ts";
+import { Result } from "@/kinds/Result.ts";
 import { createSafeWriteJson } from "./createWriteJson.ts";
 
 Deno.test("createSafeWriteJson should write file", async () => {

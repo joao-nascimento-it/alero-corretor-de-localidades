@@ -1,4 +1,4 @@
-import { Result } from "../../kinds/Result.ts";
+import { Result } from "@/kinds/Result.ts";
 
 import {
   DeleteFirstItem,

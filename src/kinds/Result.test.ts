@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "@src/deps.ts";
+import { assertStrictEquals } from "@/deps.ts";
 import { Result } from "./Result.ts";
 
 Deno.test("Result", () => {

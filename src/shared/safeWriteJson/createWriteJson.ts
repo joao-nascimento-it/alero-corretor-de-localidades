@@ -1,4 +1,4 @@
-import { Result } from "@src/kinds/Result.ts";
+import { Result } from "@/kinds/Result.ts";
 import { SafeWriteJson } from "./ISafeWriteJson.ts";
 
 interface CreateSafeWriteJsonDeps {

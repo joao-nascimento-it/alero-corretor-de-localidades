@@ -1,4 +1,4 @@
-import { Result } from "@src/kinds/Result.ts";
+import { Result } from "@/kinds/Result.ts";
 
 export type QueryAllItems<T> = () => Promise<Result<readonly T[], Error>>;
 export type InsertItem<T> = (item: T) => Promise<Result<T, Error>>;

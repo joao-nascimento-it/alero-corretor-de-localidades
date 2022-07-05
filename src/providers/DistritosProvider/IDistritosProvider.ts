@@ -1,3 +1,3 @@
-import { Distritos } from "@src/models/Distrito.ts";
+import { Distritos } from "@/models/Distrito.ts";
 
 export type QueryAllDistritos = () => Promise<Distritos>;

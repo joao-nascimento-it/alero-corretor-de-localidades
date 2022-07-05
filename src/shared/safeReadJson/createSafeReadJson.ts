@@ -1,4 +1,4 @@
-import { Result } from "@src/kinds/Result.ts";
+import { Result } from "@/kinds/Result.ts";
 import { SafeReadJson } from "./ISafeReadJson.ts";
 
 interface CreateSafeReadJsonDeps {

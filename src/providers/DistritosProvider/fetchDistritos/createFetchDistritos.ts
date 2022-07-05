@@ -1,6 +1,6 @@
-import { z } from "@src/deps.ts";
-import { Result } from "@src/kinds/Result.ts";
-import { Distrito, Distritos } from "@src/models/Distrito.ts";
+import { z } from "@/deps.ts";
+import { Result } from "@/kinds/Result.ts";
+import { Distrito, Distritos } from "@/models/Distrito.ts";
 
 const DistritosJsonResponseSchema = z.array(z.object({
   "distrito-id": z.number(),

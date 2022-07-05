@@ -1,4 +1,4 @@
-import { assertEquals } from "@src/deps.ts";
+import { assertEquals } from "@/deps.ts";
 import { createQueryAllDistritos } from "./createDistritosProvider.ts";
 
 Deno.test("Distrito Provider", async () => {
