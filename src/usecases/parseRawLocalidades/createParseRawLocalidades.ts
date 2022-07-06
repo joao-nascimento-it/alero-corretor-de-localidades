@@ -1,15 +1,20 @@
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
+import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
+import { FetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/IFetchIncorrectRawLocalidade.ts";
 
-const createConvertDatabaseToIncorrectLocalidade = ({
-  path,
-  safeReadJson,
+export const createParseRawLocalidades = ({
+  safeWriteJson,
+  fetchIncorrectRawLocalidades,
 }: {
-  path: string;
-  safeReadJson: SafeReadJson;
+  safeWriteJson: SafeWriteJson;
+  fetchIncorrectRawLocalidades: FetchIncorrectRawLocalidades;
 }) =>
-  async () => {
-    const dataResult = await safeReadJson(path);
-    dataResult;
+  async (source: string, dest: string) => {
+    const incorrectRawLocalidades = await fetchIncorrectRawLocalidades(source);
+    if (incorrectRawLocalidades.isFail()) {
+      return incorrectRawLocalidades;
+    }
+    return safeWriteJson(dest, incorrectRawLocalidades.value);
   };
 
 /*
