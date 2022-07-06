@@ -8,16 +8,12 @@ import {
   createQueryFirstItem,
   JsonRepositoryValidator,
 } from "@/repositories/JsonRepository/createJsonRepository.ts";
+import { Localidade } from "@/models/Localidade.ts";
 
 const LocalidadesSchema = z.array(z.object({
   municipio: z.string(),
   estado: z.string(),
 }));
-
-export type Localidade = Readonly<{
-  municipio: string;
-  estado: string;
-}>;
 
 const createValidateLocalidade = (): JsonRepositoryValidator<
   Localidade

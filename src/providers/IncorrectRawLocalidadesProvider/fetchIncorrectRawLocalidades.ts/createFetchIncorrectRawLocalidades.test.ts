@@ -25,8 +25,8 @@ Deno.test("createFetchIncorrectRawLocalidades", async (t) => {
     assertEquals(
       incorrectTable,
       Result.done([{
-        idmunicipionasc: "idmunicipionasc example",
-        idufnasc: "idufnasc example",
+        municipio: "idmunicipionasc example",
+        estado: "idufnasc example",
       }]),
     );
   });

@@ -1,15 +1,11 @@
 import { z } from "@/deps.ts";
 import { Result } from "@/kinds/Result.ts";
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
-
-type IncorrectRawLocalidades = ReadonlyArray<{
-  idmunicipionasc: string;
-  idufnasc: string;
-}>;
+import { Localidades } from "@/models/Localidade.ts";
 
 type CreateFetchIncorrectRawLocalidades = (deps: {
   safeReadJson: SafeReadJson;
-}) => (path: string) => Promise<Result<IncorrectRawLocalidades, Error>>;
+}) => (path: string) => Promise<Result<Localidades, Error>>;
 
 const ErrorsJsonFileSchema = z.object({
   data: z.array(
@@ -39,8 +35,8 @@ export const createFetchIncorrectRawLocalidades:
         idmunicipionasc,
         idufnasc,
       }) => ({
-        idmunicipionasc,
-        idufnasc,
+        municipio: idmunicipionasc,
+        estado: idufnasc,
       }));
 
       return Result.done(refinedData);
