@@ -1,10 +1,10 @@
 import { assertEquals } from "@/deps.ts";
 import { Result } from "@/kinds/Result.ts";
-import { createFetchIncorrectTable } from "./createFetchIncorrectTable.ts";
+import { createFetchIncorrectRawLocalidades } from "./createFetchIncorrectRawLocalidades.ts";
 
-Deno.test("createFetchIncorrectTable", async (t) => {
+Deno.test("createFetchIncorrectRawLocalidades", async (t) => {
   await t.step("Should fetch", async () => {
-    const fetchIncorrectTable = createFetchIncorrectTable({
+    const fetchIncorrectTable = createFetchIncorrectRawLocalidades({
       async safeReadJson(path) {
         await Promise.resolve();
 
