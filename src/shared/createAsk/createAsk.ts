@@ -18,13 +18,16 @@ export const createAsk = <T, E>({
     while (true) {
       const data = await printAsk(message);
       const refined = await parse(data ?? "");
+
       if (refined.isFail()) {
-        if (refined.value instanceof RepeatError) {
-          await print(refined.value.message);
+        const reason = refined.value;
+        if (reason instanceof RepeatError) {
+          await print(reason.message);
           continue;
         }
-        return refined as Result<T, E>;
+        return Result.fail(reason);
       }
-      return refined;
+
+      return Result.done(refined.value);
     }
   };

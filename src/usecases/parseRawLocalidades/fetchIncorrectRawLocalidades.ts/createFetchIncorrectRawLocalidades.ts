@@ -20,10 +20,12 @@ export const createFetchIncorrectRawLocalidades:
   CreateFetchIncorrectRawLocalidades = ({
     safeReadJson,
   }) =>
-    async (path) => {
+    async (path): Promise<Result<Localidades, Error>> => {
       const data = await safeReadJson(path);
 
-      if (data.isFail()) return data;
+      if (data.isFail()) {
+        return Result.fail(data.value);
+      }
 
       const parsedData = await ErrorsJsonFileSchema.safeParseAsync(data.value);
 
