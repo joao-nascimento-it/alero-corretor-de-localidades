@@ -1,4 +1,3 @@
-import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import { FetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/IFetchIncorrectRawLocalidade.ts";
 
