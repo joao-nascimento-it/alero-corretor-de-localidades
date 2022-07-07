@@ -6,31 +6,25 @@ import { createParseRawLocalidades } from "./createParseRawLocalidades.ts";
 import { createFetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/createFetchIncorrectRawLocalidades.ts";
 
 Deno.test("createParseRawLocalidades", async () => {
-  let destJsonFile = "";
-  const sourceJsonFile = JSON.stringify({
-    data: [{
-      idmunicipionasc: "municipio example",
-      idufnasc: "estado example",
-      somethingElse: "somethingElse example",
-    }],
-  });
+  const state = new State(
+    JSON.stringify({
+      data: [{
+        idmunicipionasc: "municipio example",
+        idufnasc: "estado example",
+        somethingElse: "somethingElse example",
+      }],
+    }),
+    "",
+  );
 
   const parseRawLocalidades = createParseRawLocalidades({
     fetchIncorrectRawLocalidades: createFetchIncorrectRawLocalidades({
       safeReadJson: createSafeReadJson({
-        async readTextFile(path) {
-          await Promise.resolve();
-          assertEquals(path, "sourceExample.json");
-          return sourceJsonFile;
-        },
+        readTextFile: state.readTextFile,
       }),
     }),
     safeWriteJson: createSafeWriteJson({
-      async writeTextFile(path, data) {
-        await Promise.resolve();
-        assertEquals(path, "destExample.json");
-        destJsonFile = data;
-      },
+      writeTextFile: state.writeTextFile,
     }),
   });
 
@@ -41,7 +35,7 @@ Deno.test("createParseRawLocalidades", async () => {
 
   assertEquals(result, Result.done(undefined));
   assertEquals(
-    sourceJsonFile,
+    state.sourceFile,
     JSON.stringify({
       data: [{
         idmunicipionasc: "municipio example",
@@ -51,10 +45,31 @@ Deno.test("createParseRawLocalidades", async () => {
     }),
   );
   assertEquals(
-    destJsonFile,
+    state.destFile,
     JSON.stringify([{
       municipio: "municipio example",
       estado: "estado example",
     }]),
   );
 });
+
+class State {
+  constructor(public sourceFile: string, public destFile: string) {}
+
+  readTextFile: typeof Deno.readTextFile = async (path) => {
+    await Promise.resolve();
+    if (path === "sourceExample.json") {
+      return this.sourceFile;
+    }
+
+    throw new Error("File does not exist");
+  };
+
+  writeTextFile: typeof Deno.writeTextFile = async (path, data) => {
+    await Promise.resolve();
+    if (path !== "destExample.json") {
+      throw new Error("File does not exist");
+    }
+    this.destFile = data;
+  };
+}
