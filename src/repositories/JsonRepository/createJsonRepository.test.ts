@@ -13,7 +13,7 @@ import {
 Deno.test("FakeJsonRepository should query All", async () => {
   const database = new Fake(["Item"]);
 
-  const queryAllItems = createQueryAllItems<string>({
+  const queryAllItems = createQueryAllItems({
     path: "file.json",
     safeReadJson: Fake.createFakeSafeReadJson(database),
     validate: Fake.createFakeJsonRepositoryValidator(),
@@ -80,7 +80,7 @@ class Fake<T> {
 
   static createFakeSafeWriteJson = <T>(
     database: Fake<T>,
-  ): SafeWriteJson =>
+  ): SafeWriteJson<never> =>
     async (path, data) => {
       await Promise.resolve();
       assertEquals(path, "file.json");
@@ -90,7 +90,7 @@ class Fake<T> {
 
   static createFakeSafeReadJson = <T>(
     database: Fake<T>,
-  ): SafeReadJson =>
+  ): SafeReadJson<never> =>
     async (path) => {
       await Promise.resolve();
       assertEquals(path, "file.json");
@@ -98,7 +98,8 @@ class Fake<T> {
     };
 
   static createFakeJsonRepositoryValidator = (): JsonRepositoryValidator<
-    string
+    string,
+    Error
   > =>
     async (data) => {
       const parsedData = await testSchema.safeParseAsync(data);

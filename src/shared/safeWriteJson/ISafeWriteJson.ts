@@ -1,6 +1,6 @@
 import { Result } from "@/kinds/Result.ts";
 
-export type SafeWriteJson = (
+export type SafeWriteJson<E> = (
   path: string,
   data: any,
-) => Promise<Result<undefined, Error>>;
+) => Promise<Result<void, E>>;

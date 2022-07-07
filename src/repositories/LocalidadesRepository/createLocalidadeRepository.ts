@@ -16,7 +16,8 @@ const LocalidadesSchema = z.array(z.object({
 }));
 
 const createValidateLocalidade = (): JsonRepositoryValidator<
-  Localidade
+  Localidade,
+  Error
 > =>
   async (data) => {
     const parsedData = await LocalidadesSchema.safeParseAsync(data);
@@ -29,44 +30,44 @@ const createValidateLocalidade = (): JsonRepositoryValidator<
 
 const validate = createValidateLocalidade();
 
-export function createQueryAllLocalidades({
+export function createQueryAllLocalidades<E>({
   path,
   safeReadJson,
 }: {
   path: string;
-  safeReadJson: SafeReadJson;
+  safeReadJson: SafeReadJson<E>;
 }) {
-  return createQueryAllItems({
+  return createQueryAllItems<Localidade, E | Error>({
     path,
     safeReadJson,
     validate,
   });
 }
 
-export function createQueryFirstLocalidade({
+export function createQueryFirstLocalidade<E>({
   path,
   safeReadJson,
 }: {
   path: string;
-  safeReadJson: SafeReadJson;
+  safeReadJson: SafeReadJson<E>;
 }) {
-  return createQueryFirstItem({
+  return createQueryFirstItem<Localidade, E | Error>({
     path,
     safeReadJson,
     validate,
   });
 }
 
-export function createInsertLocalidade({
+export function createInsertLocalidade<E>({
   path,
   safeReadJson,
   safeWriteJson,
 }: {
   path: string;
-  safeReadJson: SafeReadJson;
-  safeWriteJson: SafeWriteJson;
+  safeReadJson: SafeReadJson<E>;
+  safeWriteJson: SafeWriteJson<E>;
 }) {
-  return createInsertItem({
+  return createInsertItem<Localidade, E | Error>({
     path,
     safeReadJson,
     validate,

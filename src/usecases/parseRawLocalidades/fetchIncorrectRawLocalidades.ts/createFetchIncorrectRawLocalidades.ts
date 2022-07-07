@@ -3,10 +3,6 @@ import { Result } from "@/kinds/Result.ts";
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import { Localidades } from "@/models/Localidade.ts";
 
-type CreateFetchIncorrectRawLocalidades = (deps: {
-  safeReadJson: SafeReadJson;
-}) => (path: string) => Promise<Result<Localidades, Error>>;
-
 const ErrorsJsonFileSchema = z.object({
   data: z.array(
     z.object({
@@ -16,30 +12,31 @@ const ErrorsJsonFileSchema = z.object({
   ),
 });
 
-export const createFetchIncorrectRawLocalidades:
-  CreateFetchIncorrectRawLocalidades = ({
-    safeReadJson,
-  }) =>
-    async (path): Promise<Result<Localidades, Error>> => {
-      const data = await safeReadJson(path);
+export const createFetchIncorrectRawLocalidades = <E>({
+  safeReadJson,
+}: {
+  safeReadJson: SafeReadJson<E>;
+}) =>
+  async (path: string): Promise<Result<Localidades, E | Error>> => {
+    const data = await safeReadJson(path);
 
-      if (data.isFail()) {
-        return Result.fail(data.value);
-      }
+    if (data.isFail()) {
+      return Result.fail(data.value);
+    }
 
-      const parsedData = await ErrorsJsonFileSchema.safeParseAsync(data.value);
+    const parsedData = await ErrorsJsonFileSchema.safeParseAsync(data.value);
 
-      if (!parsedData.success) {
-        return Result.fail(parsedData.error);
-      }
+    if (!parsedData.success) {
+      return Result.fail(parsedData.error);
+    }
 
-      const refinedData = parsedData.data.data.map(({
-        idmunicipionasc,
-        idufnasc,
-      }) => ({
-        municipio: idmunicipionasc,
-        estado: idufnasc,
-      }));
+    const refinedData = parsedData.data.data.map(({
+      idmunicipionasc,
+      idufnasc,
+    }) => ({
+      municipio: idmunicipionasc,
+      estado: idufnasc,
+    }));
 
-      return Result.done(refinedData);
-    };
+    return Result.done(refinedData);
+  };

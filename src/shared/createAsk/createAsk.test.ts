@@ -3,7 +3,7 @@ import { Result } from "@/kinds/Result.ts";
 import { createAsk, CreateAskDeps, RepeatError } from "./createAsk.ts";
 
 Deno.test("createAsk", async () => {
-  const state = new State(["What is 2 + 2?"]);
+  const state = new State(["4"]);
 
   const ask = createAsk(state);
 
@@ -17,12 +17,12 @@ class State implements CreateAskDeps<string, Error> {
   printAskOutputs: string[] = [];
   constructor(public inputs: (string | null)[]) {}
 
-  async print(message: string): Promise<void> {
+  print = async (message: string): Promise<void> => {
     await Promise.resolve();
     this.printOutputs.push(message);
-  }
+  };
 
-  async printAsk(message: string): Promise<string | null> {
+  printAsk = async (message: string): Promise<string | null> => {
     await Promise.resolve();
     this.printAskOutputs.push(message);
     const data = this.inputs.shift();
@@ -30,13 +30,15 @@ class State implements CreateAskDeps<string, Error> {
       throw new Error("No input");
     }
     return data;
-  }
+  };
 
-  async parse(data: string): Promise<Result<string, Error | RepeatError>> {
+  parse = async (
+    data: string,
+  ): Promise<Result<string, RepeatError>> => {
     await Promise.resolve();
     if (data !== "4") {
       return Result.fail(new RepeatError(""));
     }
     return Result.done(data);
-  }
+  };
 }

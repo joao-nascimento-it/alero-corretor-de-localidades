@@ -7,7 +7,7 @@ interface CreateSafeReadJsonDeps {
 
 export function createSafeReadJson(
   { readTextFile }: CreateSafeReadJsonDeps,
-): SafeReadJson {
+): SafeReadJson<Error> {
   return async (path) => {
     try {
       const file = await readTextFile(path);

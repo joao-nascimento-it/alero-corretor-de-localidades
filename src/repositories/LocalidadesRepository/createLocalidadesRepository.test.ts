@@ -68,7 +68,7 @@ class Fake<T> {
 
   static createFakeSafeWriteJson = <T>(
     database: Fake<T>,
-  ): SafeWriteJson =>
+  ): SafeWriteJson<never> =>
     async (path, data) => {
       await Promise.resolve();
       assertEquals(path, "file.json");
@@ -78,7 +78,7 @@ class Fake<T> {
 
   static createFakeSafeReadJson = <T>(
     database: Fake<T>,
-  ): SafeReadJson =>
+  ): SafeReadJson<never> =>
     async (path) => {
       await Promise.resolve();
       assertEquals(path, "file.json");

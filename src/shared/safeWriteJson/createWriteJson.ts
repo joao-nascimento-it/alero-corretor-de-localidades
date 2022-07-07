@@ -7,7 +7,7 @@ interface CreateSafeWriteJsonDeps {
 
 export function createSafeWriteJson({
   writeTextFile,
-}: CreateSafeWriteJsonDeps): SafeWriteJson {
+}: CreateSafeWriteJsonDeps): SafeWriteJson<Error> {
   return async (path, data) => {
     try {
       const file = JSON.stringify(data);

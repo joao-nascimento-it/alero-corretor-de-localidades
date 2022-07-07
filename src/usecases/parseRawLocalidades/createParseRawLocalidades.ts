@@ -1,11 +1,11 @@
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import { FetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/IFetchIncorrectRawLocalidade.ts";
 
-export const createParseRawLocalidades = ({
+export const createParseRawLocalidades = <E>({
   safeWriteJson,
   fetchIncorrectRawLocalidades,
 }: {
-  safeWriteJson: SafeWriteJson;
+  safeWriteJson: SafeWriteJson<E>;
   fetchIncorrectRawLocalidades: FetchIncorrectRawLocalidades;
 }) =>
   async (source: string, dest: string) => {
