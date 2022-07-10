@@ -122,5 +122,5 @@ export const createDeleteFirstItem = <T, E>({
     const result = await safeWriteJson(path, tail);
     if (result.isFail()) return result;
 
-    return Result.done(undefined);
+    return Result.done(head);
   };
