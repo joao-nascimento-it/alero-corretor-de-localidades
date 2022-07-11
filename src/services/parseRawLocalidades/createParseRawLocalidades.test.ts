@@ -5,52 +5,110 @@ import { createSafeWriteJson } from "@/shared/safeWriteJson/createWriteJson.ts";
 import { createParseRawLocalidadesService } from "./createParseRawLocalidades.ts";
 import { createFetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/createFetchIncorrectRawLocalidades.ts";
 
-Deno.test("createParseRawLocalidades", async () => {
-  const state = new State(
-    JSON.stringify({
-      data: [{
-        idmunicipionasc: "municipio example",
-        idufnasc: "estado example",
-        somethingElse: "somethingElse example",
-      }],
-    }),
-    "",
-  );
-
-  const parseRawLocalidades = createParseRawLocalidadesService({
-    fetchIncorrectRawLocalidades: createFetchIncorrectRawLocalidades({
-      safeReadJson: createSafeReadJson({
-        readTextFile: state.readTextFile,
+Deno.test("createParseRawLocalidades", async (t) => {
+  await t.step("Should parse 1 localidade", async () => {
+    const state = new State(
+      JSON.stringify({
+        data: [{
+          idmunicipionasc: "municipio example",
+          idufnasc: "estado example",
+          somethingElse: "somethingElse example",
+        }],
       }),
-    }),
-    safeWriteJson: createSafeWriteJson({
-      writeTextFile: state.writeTextFile,
-    }),
+      "",
+    );
+
+    const parseRawLocalidades = createParseRawLocalidadesService({
+      fetchIncorrectRawLocalidades: createFetchIncorrectRawLocalidades({
+        safeReadJson: createSafeReadJson({
+          readTextFile: state.readTextFile,
+        }),
+      }),
+      safeWriteJson: createSafeWriteJson({
+        writeTextFile: state.writeTextFile,
+      }),
+    });
+
+    const result = await parseRawLocalidades(
+      "sourceExample.json",
+      "destExample.json",
+    );
+
+    assertEquals(result, Result.done(undefined));
+    assertEquals(
+      state.sourceFile,
+      JSON.stringify({
+        data: [{
+          idmunicipionasc: "municipio example",
+          idufnasc: "estado example",
+          somethingElse: "somethingElse example",
+        }],
+      }),
+    );
+    assertEquals(
+      state.destFile,
+      JSON.stringify([{
+        municipio: "municipio example",
+        estado: "estado example",
+      }]),
+    );
   });
 
-  const result = await parseRawLocalidades(
-    "sourceExample.json",
-    "destExample.json",
-  );
+  await t.step("Should filter two equals localidades", async () => {
+    const state = new State(
+      JSON.stringify({
+        data: [{
+          idmunicipionasc: "municipio example",
+          idufnasc: "estado example",
+          somethingElse: "somethingElse example",
+        }, {
+          idmunicipionasc: "municipio example",
+          idufnasc: "estado example",
+          somethingElse: "somethingElse example",
+        }],
+      }),
+      "",
+    );
 
-  assertEquals(result, Result.done(undefined));
-  assertEquals(
-    state.sourceFile,
-    JSON.stringify({
-      data: [{
-        idmunicipionasc: "municipio example",
-        idufnasc: "estado example",
-        somethingElse: "somethingElse example",
-      }],
-    }),
-  );
-  assertEquals(
-    state.destFile,
-    JSON.stringify([{
-      municipio: "municipio example",
-      estado: "estado example",
-    }]),
-  );
+    const parseRawLocalidades = createParseRawLocalidadesService({
+      fetchIncorrectRawLocalidades: createFetchIncorrectRawLocalidades({
+        safeReadJson: createSafeReadJson({
+          readTextFile: state.readTextFile,
+        }),
+      }),
+      safeWriteJson: createSafeWriteJson({
+        writeTextFile: state.writeTextFile,
+      }),
+    });
+
+    const result = await parseRawLocalidades(
+      "sourceExample.json",
+      "destExample.json",
+    );
+
+    assertEquals(result, Result.done(undefined));
+    assertEquals(
+      state.sourceFile,
+      JSON.stringify({
+        data: [{
+          idmunicipionasc: "municipio example",
+          idufnasc: "estado example",
+          somethingElse: "somethingElse example",
+        }, {
+          idmunicipionasc: "municipio example",
+          idufnasc: "estado example",
+          somethingElse: "somethingElse example",
+        }],
+      }),
+    );
+    assertEquals(
+      state.destFile,
+      JSON.stringify([{
+        municipio: "municipio example",
+        estado: "estado example",
+      }]),
+    );
+  });
 });
 
 class State {
