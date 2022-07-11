@@ -1,6 +1,8 @@
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
-import { Localidade, Localidades } from "../../models/Localidade.ts";
+import { Result } from "../../kinds/Result.ts";
+import { Localidades } from "../../models/Localidade.ts";
 import { FetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/IFetchIncorrectRawLocalidade.ts";
+import { ParseRawLocalidadesService } from "./IParseRawLocalidades.service.ts";
 
 export const createParseRawLocalidadesService = <E>({
   safeWriteJson,
@@ -8,12 +10,12 @@ export const createParseRawLocalidadesService = <E>({
 }: {
   safeWriteJson: SafeWriteJson<E>;
   fetchIncorrectRawLocalidades: FetchIncorrectRawLocalidades;
-}) =>
+}): ParseRawLocalidadesService<E | Error> =>
   async (source: string, dest: string) => {
     const incorrectRawLocalidades = await fetchIncorrectRawLocalidades(source);
 
     if (incorrectRawLocalidades.isFail()) {
-      return incorrectRawLocalidades;
+      return Result.fail(incorrectRawLocalidades.value);
     }
 
     const refined = incorrectRawLocalidades.value
