@@ -2,7 +2,7 @@ import { assertEquals } from "@/deps.ts";
 import { Result } from "@/kinds/Result.ts";
 import { createSafeReadJson } from "@/shared/safeReadJson/createSafeReadJson.ts";
 import { createSafeWriteJson } from "@/shared/safeWriteJson/createWriteJson.ts";
-import { createParseRawLocalidades } from "./createParseRawLocalidades.ts";
+import { createParseRawLocalidadesService } from "./createParseRawLocalidades.ts";
 import { createFetchIncorrectRawLocalidades } from "./fetchIncorrectRawLocalidades.ts/createFetchIncorrectRawLocalidades.ts";
 
 Deno.test("createParseRawLocalidades", async () => {
@@ -17,7 +17,7 @@ Deno.test("createParseRawLocalidades", async () => {
     "",
   );
 
-  const parseRawLocalidades = createParseRawLocalidades({
+  const parseRawLocalidades = createParseRawLocalidadesService({
     fetchIncorrectRawLocalidades: createFetchIncorrectRawLocalidades({
       safeReadJson: createSafeReadJson({
         readTextFile: state.readTextFile,
