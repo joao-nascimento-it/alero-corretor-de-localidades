@@ -56,7 +56,7 @@ Deno.test("JsonRepository should query first item", async () => {
   assertEquals(database.array, ["Item"]);
 });
 
-Deno.test("JsonRepository should query first item", async () => {
+Deno.test("JsonRepository should delete first item", async () => {
   const database = new Fake(["Item"]);
 
   const deleteFirstItem = createDeleteFirstItem({
@@ -68,7 +68,7 @@ Deno.test("JsonRepository should query first item", async () => {
 
   const result = await deleteFirstItem();
 
-  assertEquals(result, Result.done(undefined));
+  assertEquals(result, Result.done("Item"));
   assertEquals(database.array, []);
 });
 
