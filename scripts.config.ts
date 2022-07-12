@@ -6,7 +6,9 @@ const config: DenonConfig = {
       cmd: "deno run main.ts",
       desc: "Start application",
     },
-
+    parseRaw: {
+      cmd: "deno run src/controllers/parseRawLocalidades/index.ts",
+    },
     test: {
       cmd: "deno test ./src",
     },
