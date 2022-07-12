@@ -41,7 +41,9 @@ const createUpdateLocalidadesController = <E>(
         break;
       }
 
-      await print("Não existe essa opção, por favor, digite uma opção valida!");
+      await print(
+        "Não existe essa opção, por favor, digite uma opção valida!",
+      );
     }
 
     const distrito = similars[parseInt(distritoName)]!;
