@@ -5,80 +5,80 @@ import { Print } from "@/shared/print/IPrint.ts";
 import { Ask } from "@/shared/ask/IAsk.ts";
 import { Result } from "@/kinds/Result.ts";
 
-const createUpdateLocalidadesController = <E>(
+export const createUpdateLocalidadesController = <E>(
   queryFirstIncorrectLocalidade: QueryFirstIncorrectLocalidade<E>,
   querySimilarDistritosByName: QuerySimilarDistritosByName,
-  print: Print,
-  ask: Ask,
-) => {
-  async function askSugestion(
-    incorrectLocalidade: Localidade,
-  ): Promise<Result<Localidade, Error>> {
-    const similars = await querySimilarDistritosByName(
-      incorrectLocalidade.municipio,
-    );
+) =>
+  (print: Print, ask: Ask) => {
+    async function askSugestion(
+      incorrectLocalidade: Localidade,
+    ): Promise<Result<Localidade, Error>> {
+      const similars = await querySimilarDistritosByName(
+        incorrectLocalidade.municipio,
+      );
 
-    const orderedDistritos = similars
-      .map((distrito, index) =>
-        `${index}: {
+      const orderedDistritos = similars
+        .map((distrito, index) =>
+          `${index}: {
           distrito: ${distrito["distrito-nome"]},
           municipio: ${distrito["municipio-nome"]},
           municipio: ${distrito["UF-sigla"]},
         }`
-      ).join("\n");
+        ).join("\n");
 
-    let distritoName: string;
-    while (true) {
-      await print(`Qual o municipio correto para {
+      let distritoName: string;
+      while (true) {
+        await print(`Qual o municipio correto para {
           estado: ${incorrectLocalidade.estado},
           municipio: ${incorrectLocalidade.municipio}
         }?
         ${orderedDistritos}`);
 
-      distritoName = await ask("Resposta: ");
+        distritoName = await ask("Resposta: ");
 
-      if (isValidResponse(distritoName)) {
-        break;
+        if (isValidResponse(distritoName)) {
+          break;
+        }
+
+        await print(
+          "Não existe essa opção, por favor, digite uma opção valida!",
+        );
       }
 
-      await print(
-        "Não existe essa opção, por favor, digite uma opção valida!",
-      );
+      const distrito = similars[parseInt(distritoName)]!;
+
+      if (!distrito) {
+        throw new RangeError(parseInt(distritoName).toString());
+      }
+
+      return Result.done({
+        municipio: distrito["municipio-nome"],
+        estado: distrito["UF-sigla"],
+      });
     }
 
-    const distrito = similars[parseInt(distritoName)]!;
+    return async function updateLocalidade() {
+      const incorrectLocalidadeResult = await queryFirstIncorrectLocalidade();
 
-    if (!distrito) {
-      throw new RangeError(parseInt(distritoName).toString());
-    }
+      if (incorrectLocalidadeResult.isFail()) {
+        return incorrectLocalidadeResult;
+      }
 
-    return Result.done({
-      municipio: distrito["municipio-nome"],
-      estado: distrito["UF-sigla"],
-    });
-  }
+      const incorrectLocalidade = incorrectLocalidadeResult.value;
 
-  return async function updateLocalidade() {
-    const incorrectLocalidadeResult = await queryFirstIncorrectLocalidade();
+      if (!incorrectLocalidade) {
+        return Result.fail(Error("Nenhuma localidade encontrada"));
+      }
 
-    if (incorrectLocalidadeResult.isFail()) {
-      return incorrectLocalidadeResult;
-    }
-    const incorrectLocalidade = incorrectLocalidadeResult.value;
-
-    if (!incorrectLocalidade) {
-      return Result.fail(Error("Nenhuma localidade encontrada"));
-    }
-
-    const sugestionResult = await askSugestion(incorrectLocalidade);
-    if (sugestionResult.isFail()) {
-      return sugestionResult;
-    }
-    const nextLocalidade = sugestionResult.value;
-    // deleteFirstIncorrectLocalidade()
-    return;
+      const sugestionResult = await askSugestion(incorrectLocalidade);
+      if (sugestionResult.isFail()) {
+        return sugestionResult;
+      }
+      const nextLocalidade = sugestionResult.value;
+      // deleteFirstIncorrectLocalidade()
+      return;
+    };
   };
-};
 
 function isValidResponse(
   data: string,
