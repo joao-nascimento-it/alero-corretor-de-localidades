@@ -8,77 +8,85 @@ import { Result } from "@/kinds/Result.ts";
 export const createUpdateLocalidadesController = <E>(
   queryFirstIncorrectLocalidade: QueryFirstIncorrectLocalidade<E>,
   querySimilarDistritosByName: QuerySimilarDistritosByName,
-) =>
-  (print: Print, ask: Ask) => {
-    async function askSugestion(
-      incorrectLocalidade: Localidade,
-    ): Promise<Result<Localidade, Error>> {
-      const similars = await querySimilarDistritosByName(
-        incorrectLocalidade.municipio,
-      );
+  print: Print,
+  ask: Ask,
+) => {
+  async function askSugestion(
+    incorrectLocalidade: Localidade,
+  ): Promise<Result<Localidade, Error>> {
+    const similars = await querySimilarDistritosByName(
+      incorrectLocalidade.municipio,
+    );
 
-      const orderedDistritos = similars
-        .map((distrito, index) =>
-          `${index}: {
+    const orderedDistritos = similars
+      .slice(0, 9)
+      .map((distrito, index) =>
+        `${index}: {
           distrito: ${distrito["distrito-nome"]},
           municipio: ${distrito["municipio-nome"]},
           municipio: ${distrito["UF-sigla"]},
         }`
-        ).join("\n");
+      ).join("\n");
 
-      let distritoName: string;
-      while (true) {
-        await print(`Qual o municipio correto para {
+    let distritoName: string;
+    while (true) {
+      await print(`Qual o municipio correto para {
           estado: ${incorrectLocalidade.estado},
           municipio: ${incorrectLocalidade.municipio}
         }?
         ${orderedDistritos}`);
 
-        distritoName = await ask("Resposta: ");
+      distritoName = await ask("Resposta: ");
 
-        if (isValidResponse(distritoName)) {
-          break;
-        }
-
-        await print(
-          "Não existe essa opção, por favor, digite uma opção valida!",
-        );
+      if (isValidResponse(distritoName)) {
+        break;
       }
 
-      const distrito = similars[parseInt(distritoName)]!;
-
-      if (!distrito) {
-        throw new RangeError(parseInt(distritoName).toString());
-      }
-
-      return Result.done({
-        municipio: distrito["municipio-nome"],
-        estado: distrito["UF-sigla"],
-      });
+      await print(
+        "Não existe essa opção, por favor, digite uma opção valida!",
+      );
     }
 
-    return async function updateLocalidade() {
-      const incorrectLocalidadeResult = await queryFirstIncorrectLocalidade();
+    const distrito = similars[parseInt(distritoName)]!;
 
-      if (incorrectLocalidadeResult.isFail()) {
-        return incorrectLocalidadeResult;
-      }
+    if (!distrito) {
+      throw new RangeError(parseInt(distritoName).toString());
+    }
 
-      const incorrectLocalidade = incorrectLocalidadeResult.value;
+    return Result.done({
+      municipio: distrito["municipio-nome"],
+      estado: distrito["UF-sigla"],
+    });
+  }
 
-      if (!incorrectLocalidade) {
-        return Result.fail(Error("Nenhuma localidade encontrada"));
-      }
+  return async function updateLocalidade() {
+    const incorrectLocalidadeResult = await queryFirstIncorrectLocalidade();
 
-      const sugestionResult = await askSugestion(incorrectLocalidade);
-      if (sugestionResult.isFail()) {
-        return sugestionResult;
-      }
-      const nextLocalidade = sugestionResult.value;
-      // deleteFirstIncorrectLocalidade()
-      return;
+    if (incorrectLocalidadeResult.isFail()) {
+      return incorrectLocalidadeResult;
+    }
+
+    const incorrectLocalidade = incorrectLocalidadeResult.value;
+
+    if (!incorrectLocalidade) {
+      return Result.fail(Error("Nenhuma localidade encontrada"));
+    }
+
+    const sugestionResult = await askSugestion(incorrectLocalidade);
+    if (sugestionResult.isFail()) {
+      return sugestionResult;
+    }
+    const nextLocalidade = sugestionResult.value;
+
+    const correctLocalidade = {
+      incorrect: incorrectLocalidade,
+      correct: nextLocalidade,
     };
+
+    // deleteFirstIncorrectLocalidade()
+    return;
   };
+};
 
 function isValidResponse(
   data: string,

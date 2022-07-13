@@ -7,6 +7,8 @@ import { createUpdateLocalidadesController } from "./createUpdateLocalidades.con
 export const updateLocalidadesController = createUpdateLocalidadesController(
   queryFirstIncorrectLocalidade,
   querySimilarDistritosByName,
+  print,
+  ask,
 );
 
-await updateLocalidadesController(print, ask);
+await updateLocalidadesController();
