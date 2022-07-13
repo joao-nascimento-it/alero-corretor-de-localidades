@@ -1,4 +1,7 @@
-import { createQueryAllDistritos } from "./createDistritosProvider.ts";
+import {
+  createQueryAllDistritos,
+  createQuerySimilarDistritosByName,
+} from "./createDistritosProvider.ts";
 import { fetchDistritos } from "./fetchDistritos/index.ts";
 
 const databaseResult = await fetchDistritos();
@@ -10,3 +13,7 @@ if (databaseResult.isFail()) {
 const database = databaseResult.value;
 
 export const queryAllDistritos = createQueryAllDistritos(database);
+
+export const querySimilarDistritosByName = createQuerySimilarDistritosByName(
+  database,
+);
