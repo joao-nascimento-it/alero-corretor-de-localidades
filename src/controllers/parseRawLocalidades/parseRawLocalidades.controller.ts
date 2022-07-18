@@ -4,8 +4,10 @@ import { Print } from "@/shared/print/IPrint.ts";
 
 export const createParseRawLocalidadesController = <E>(
   parseRawLocalidadesService: ParseRawLocalidadesService<E>,
+  print: Print,
+  ask: Ask,
 ) =>
-  async (print: Print, ask: Ask) => {
+  async () => {
     let source: string;
     let dest: string;
     while (true) {

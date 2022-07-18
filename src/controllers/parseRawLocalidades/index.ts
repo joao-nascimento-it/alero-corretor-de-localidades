@@ -5,5 +5,7 @@ import { createParseRawLocalidadesController } from "./parseRawLocalidades.contr
 
 const parseRawLocalidadesController = createParseRawLocalidadesController(
   parseRawLocalidadesService,
+  print,
+  ask,
 );
-await parseRawLocalidadesController(print, ask);
+await parseRawLocalidadesController();
