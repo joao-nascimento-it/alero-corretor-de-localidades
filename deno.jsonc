@@ -8,5 +8,10 @@
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": true
   },
-  "importMap": "import_map.json"
+  "importMap": "import_map.json",
+  "tasks": {
+    "dev": "deno run --watch main.ts",
+    "parse-raw": "deno run src/controllers/parseRawLocalidades/index.ts",
+    "update-localidade": "deno run src/controllers/updateLocalidade/index.ts"
+  }
 }
