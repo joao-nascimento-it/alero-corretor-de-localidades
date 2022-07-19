@@ -24,3 +24,14 @@ export function createQuerySimilarDistritosByName(
     );
   };
 }
+
+export const filterSimilarDistritosByName = (
+  target: string,
+  distritos: Distritos,
+) => {
+  return sortBySimilarString(
+    target,
+    distritos,
+    (item) => item["distrito-nome"],
+  );
+};

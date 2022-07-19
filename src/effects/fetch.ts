@@ -1,2 +1,2 @@
-export type Fetch = typeof fetch;
-export const fetch = globalThis.fetch;
+export type Fetch = typeof globalThis.fetch;
+export const fetch: Fetch = globalThis.fetch;
