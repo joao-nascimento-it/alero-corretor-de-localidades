@@ -11,7 +11,7 @@
   "importMap": "import_map.json",
   "tasks": {
     "dev": "deno run --watch main.ts",
-    "parse-raw": "deno run src/controllers/parseRawLocalidades/index.ts",
-    "update-localidade": "deno run src/controllers/updateLocalidade/index.ts"
+    "parse-raw": "deno run -A src/controllers/parseRawLocalidades/index.ts",
+    "update-localidade": "deno run -A src/controllers/updateLocalidade/index.ts"
   }
 }

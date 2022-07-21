@@ -4,34 +4,30 @@ import {
 } from "@/repositories/IncorrectLocalidadesRepository/IIncorrectLocalidadesRepository.ts";
 import { Localidade } from "@/models/Localidade.ts";
 import {
+  FindOneDistritoByMunicipioId,
   QueryAllDistritos,
 } from "@/providers/DistritosProvider/IDistritosProvider.ts";
 import { Print } from "@/shared/print/IPrint.ts";
 import { Ask } from "@/shared/ask/IAsk.ts";
 import { Result } from "@/kinds/Result.ts";
-import { Distritos } from "@/models/Distrito.ts";
+import { Distrito, Distritos } from "@/models/Distrito.ts";
 import { filterSimilarDistritosByName } from "@/providers/DistritosProvider/createDistritosProvider.ts";
 import { InsertCorrectLocalidade } from "@/repositories/CorrectLocalidadesRepository/CorrectLocalidadesRepository.ts";
+import { InsertIgnoredLocalidade } from "@/repositories/IgnoredLocalidadesRepository/IIgnoredLocalidadesRepository.ts";
 
 function getSugestionQuestion(
   incorrectLocalidade: Localidade,
   similarDistritos: Distritos,
 ) {
   const orderedDistritos = similarDistritos
-    .slice(0, 9)
-    .map((distrito, index) =>
-      `${index}: {
-        distrito: ${distrito["distrito-nome"]},
-        municipio: ${distrito["municipio-nome"]},
-        estado: ${distrito["UF-sigla"]},
-      }`
-    ).join("\n");
+    .slice(0, 10)
+    .map((distrito, index) => {
+      return `${index}: { distrito: ${distrito["distrito-nome"]}, municipio: ${
+        distrito["municipio-nome"]
+      }, estado: ${distrito["UF-sigla"]} };`;
+    }).join("\n");
 
-  return `Qual o municipio correto para {
-    estado: ${incorrectLocalidade.estado},
-    municipio: ${incorrectLocalidade.municipio}
-  }?
-  ${orderedDistritos}`;
+  return `Qual a localidade correta para { municipio: ${incorrectLocalidade.municipio}, estado: ${incorrectLocalidade.estado} }?\n${orderedDistritos}`;
 }
 
 function isValidResponse(
@@ -50,44 +46,105 @@ function isValidResponse(
 }
 
 interface AskSugestionState {
-  print: Print;
   ask: Ask;
 }
 
 async function askSugestion(
+  state: AskSugestionState,
   incorrectLocalidade: Localidade,
   similarDistritos: Distritos,
-  state: AskSugestionState,
 ) {
   const sugestionQuestion = getSugestionQuestion(
     incorrectLocalidade,
     similarDistritos,
   );
 
-  await state.print(sugestionQuestion);
-
-  return await state.ask("Resposta: ");
+  return await state.ask(
+    sugestionQuestion +
+      "\n'm' para manual, 'i' para ignorar ou 0 a 9 para sugestão\nResposta:",
+  );
 }
 
-interface GetSugestionState extends AskSugestionState {
+interface AskManualSugestionState {
+  print: Print;
+  ask: Ask;
+  findOneDistritoByMunicipioId: FindOneDistritoByMunicipioId;
+}
+
+async function askManualSugestion(
+  state: AskManualSugestionState,
+  incorrectLocalidade: Localidade,
+): Promise<Distrito> {
+  manualSugestionLoop:
+  while (true) {
+    const municipioId = await state.ask(
+      `Qual o id de municipio correto para a localidade: { municipio: ${incorrectLocalidade.municipio}, estado: ${incorrectLocalidade.estado} }?\nResposta:`,
+    );
+    const distrito = await state.findOneDistritoByMunicipioId(municipioId);
+    if (!distrito) {
+      await state.print(
+        "----------------\nMunicipio não existe, por favor digite um correto!",
+      );
+      continue manualSugestionLoop;
+    }
+
+    confirmationloop:
+    while (true) {
+      const confirmation = await state.ask(
+        `Deseja confirmar a mudança\nde: { municipio: ${incorrectLocalidade.municipio}, estado: ${incorrectLocalidade.estado} }\npara: { municipio: ${
+          distrito["municipio-nome"]
+        }, estado: ${distrito["UF-sigla"]} }?\nReposta y/n: `,
+      );
+
+      if (confirmation === "n") {
+        await state.print("----------------\nTudo bem, responda novamente!");
+        continue manualSugestionLoop;
+      }
+
+      if (confirmation !== "y") {
+        await state.print(
+          "----------------\nSomente 'y' ou 'n' como resposta!",
+        );
+        continue confirmationloop;
+      }
+
+      await state.print("----------------\nCerto...");
+      return distrito;
+    }
+  }
+}
+
+interface GetSugestionState extends AskSugestionState, AskManualSugestionState {
   print: Print;
 }
-
 async function getSugestion(
+  state: GetSugestionState,
   incorrectLocalidade: Localidade,
   similarDistritos: Distritos,
-  state: GetSugestionState,
-): Promise<Result<Localidade, Error>> {
+): Promise<Result<Localidade, Error | "i">> {
+  getSugestionLoop:
   while (true) {
     const sugestionIndex = await askSugestion(
+      state,
       incorrectLocalidade,
       similarDistritos,
-      state,
     );
+
+    if (sugestionIndex === "m") {
+      const distrito = await askManualSugestion(state, incorrectLocalidade);
+      return Result.done({
+        municipio: distrito["municipio-nome"],
+        estado: distrito["UF-sigla"],
+      });
+    }
+
+    if (sugestionIndex === "i") {
+      return Result.fail("i");
+    }
 
     if (!isValidResponse(sugestionIndex)) {
       await state.print(
-        "Não existe essa opção, por favor, digite uma opção valida!",
+        "----------------\nNão existe essa opção, digite somente de 0 a 9 ou 'm' para manual e 'i' para ignorar",
       );
       continue;
     }
@@ -98,10 +155,32 @@ async function getSugestion(
       throw new RangeError(parseInt(sugestionIndex).toString());
     }
 
-    return Result.done({
-      municipio: distrito["municipio-nome"],
-      estado: distrito["UF-sigla"],
-    });
+    confirmationloop:
+    while (true) {
+      const confirmation = await state.ask(
+        `Deseja confirmar a mudança\nde: { municipio: ${incorrectLocalidade.municipio}, estado: ${incorrectLocalidade.estado} }\npara: { municipio: ${
+          distrito["municipio-nome"]
+        }, estado: ${distrito["UF-sigla"]} }?\nReposta y/n: `,
+      );
+
+      if (confirmation === "n") {
+        await state.print("----------------\nTudo bem, responda novamente!");
+        continue getSugestionLoop;
+      }
+
+      if (confirmation !== "y") {
+        await state.print(
+          "----------------\nSomente 'y' ou 'n' como resposta!",
+        );
+        continue confirmationloop;
+      }
+
+      await state.print("----------------\nCerto...");
+      return Result.done({
+        municipio: distrito["municipio-nome"],
+        estado: distrito["UF-sigla"],
+      });
+    }
   }
 }
 
@@ -109,11 +188,12 @@ interface UpdateLocalidadeState extends GetSugestionState {
   queryFirstIncorrectLocalidade: QueryFirstIncorrectLocalidade<Error>;
   deleteFirstIncorrectLocalidade: DeleteFirstIncorrectLocalidade<Error>;
   insertCorrectLocalidade: InsertCorrectLocalidade<Error>;
+  insertIgnoredLocalidade: InsertIgnoredLocalidade<Error>;
 }
 
 async function updateLocalidade(
-  distritos: Distritos,
   state: UpdateLocalidadeState,
+  distritos: Distritos,
 ): Promise<Result<void, Error>> {
   const incorrectLocalidadeResult = await state
     .queryFirstIncorrectLocalidade();
@@ -131,25 +211,31 @@ async function updateLocalidade(
   const similarDistritos = filterSimilarDistritosByName(
     incorrectLocalidade.municipio,
     distritos,
-  ).slice(0, 9);
+  ).slice(0, 10);
 
   const sugestion = await getSugestion(
+    state,
     incorrectLocalidade,
     similarDistritos,
-    state,
   );
 
   if (sugestion.isFail()) {
-    return sugestion;
-  }
+    const value = sugestion.value;
+    if (value === "i") {
+      await state.insertIgnoredLocalidade(incorrectLocalidade);
+    }
+    if (value instanceof Error) {
+      return Result.fail(value);
+    }
+  } else {
+    const insertedCorrectLocalidade = await state.insertCorrectLocalidade({
+      incorrect: incorrectLocalidade,
+      correct: sugestion.value,
+    });
 
-  const insertedCorrectLocalidade = await state.insertCorrectLocalidade({
-    incorrect: incorrectLocalidade,
-    correct: sugestion.value,
-  });
-
-  if (insertedCorrectLocalidade.isFail()) {
-    return insertedCorrectLocalidade;
+    if (insertedCorrectLocalidade.isFail()) {
+      return insertedCorrectLocalidade;
+    }
   }
 
   const deletedIncorrectLocalidade = await state
@@ -166,16 +252,17 @@ interface UpdateLocalidadeLoopState extends UpdateLocalidadeState {
 }
 
 async function updateLocalidadeLoop(
-  distritos: Distritos,
   state: UpdateLocalidadeControllerState,
+  distritos: Distritos,
 ) {
   while (true) {
-    const result = await updateLocalidade(distritos, state);
+    const result = await updateLocalidade(state, distritos);
     if (result.isFail()) {
       return result;
     }
   }
 }
+
 export interface UpdateLocalidadeControllerState
   extends UpdateLocalidadeLoopState {
   queryAllDistritos: QueryAllDistritos;
@@ -185,5 +272,5 @@ export async function UpdateLocalidadesController(
   state: UpdateLocalidadeControllerState,
 ) {
   const distritos = await state.queryAllDistritos();
-  await updateLocalidadeLoop(distritos, state);
+  await updateLocalidadeLoop(state, distritos);
 }
