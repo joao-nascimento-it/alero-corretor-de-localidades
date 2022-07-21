@@ -1,4 +1,7 @@
-import { QueryFirstIncorrectLocalidade } from "@/repositories/IncorrectLocalidadesRepository/IIncorrectLocalidadesRepository.ts";
+import {
+  DeleteFirstIncorrectLocalidade,
+  QueryFirstIncorrectLocalidade,
+} from "@/repositories/IncorrectLocalidadesRepository/IIncorrectLocalidadesRepository.ts";
 import { Localidade } from "@/models/Localidade.ts";
 import {
   QueryAllDistritos,
@@ -6,21 +9,21 @@ import {
 import { Print } from "@/shared/print/IPrint.ts";
 import { Ask } from "@/shared/ask/IAsk.ts";
 import { Result } from "@/kinds/Result.ts";
-import { Distritos } from "../../models/Distrito.ts";
-import { CorrectLocalidade } from "../../models/CorrectLocalidade.ts";
-import { filterSimilarDistritosByName } from "../../providers/DistritosProvider/createDistritosProvider.ts";
+import { Distritos } from "@/models/Distrito.ts";
+import { filterSimilarDistritosByName } from "@/providers/DistritosProvider/createDistritosProvider.ts";
+import { InsertCorrectLocalidade } from "@/repositories/CorrectLocalidadesRepository/CorrectLocalidadesRepository.ts";
 
 function getSugestionQuestion(
   incorrectLocalidade: Localidade,
-  distritos: Distritos,
+  similarDistritos: Distritos,
 ) {
-  const orderedDistritos = distritos
+  const orderedDistritos = similarDistritos
     .slice(0, 9)
     .map((distrito, index) =>
       `${index}: {
         distrito: ${distrito["distrito-nome"]},
         municipio: ${distrito["municipio-nome"]},
-        municipio: ${distrito["UF-sigla"]},
+        estado: ${distrito["UF-sigla"]},
       }`
     ).join("\n");
 
@@ -53,12 +56,12 @@ interface AskSugestionState {
 
 async function askSugestion(
   incorrectLocalidade: Localidade,
-  distritos: Distritos,
+  similarDistritos: Distritos,
   state: AskSugestionState,
 ) {
   const sugestionQuestion = getSugestionQuestion(
     incorrectLocalidade,
-    distritos,
+    similarDistritos,
   );
 
   await state.print(sugestionQuestion);
@@ -72,13 +75,13 @@ interface GetSugestionState extends AskSugestionState {
 
 async function getSugestion(
   incorrectLocalidade: Localidade,
-  distritos: Distritos,
+  similarDistritos: Distritos,
   state: GetSugestionState,
 ): Promise<Result<Localidade, Error>> {
   while (true) {
     const sugestionIndex = await askSugestion(
       incorrectLocalidade,
-      distritos,
+      similarDistritos,
       state,
     );
 
@@ -86,9 +89,10 @@ async function getSugestion(
       await state.print(
         "Não existe essa opção, por favor, digite uma opção valida!",
       );
+      continue;
     }
 
-    const distrito = distritos[parseInt(sugestionIndex)];
+    const distrito = similarDistritos[parseInt(sugestionIndex)];
 
     if (!distrito) {
       throw new RangeError(parseInt(sugestionIndex).toString());
@@ -103,6 +107,8 @@ async function getSugestion(
 
 interface UpdateLocalidadeState extends GetSugestionState {
   queryFirstIncorrectLocalidade: QueryFirstIncorrectLocalidade<Error>;
+  deleteFirstIncorrectLocalidade: DeleteFirstIncorrectLocalidade<Error>;
+  insertCorrectLocalidade: InsertCorrectLocalidade<Error>;
 }
 
 async function updateLocalidade(
@@ -125,7 +131,7 @@ async function updateLocalidade(
   const similarDistritos = filterSimilarDistritosByName(
     incorrectLocalidade.municipio,
     distritos,
-  );
+  ).slice(0, 9);
 
   const sugestion = await getSugestion(
     incorrectLocalidade,
@@ -137,15 +143,25 @@ async function updateLocalidade(
     return sugestion;
   }
 
-  const correctLocalidade = <CorrectLocalidade> {
+  const insertedCorrectLocalidade = await state.insertCorrectLocalidade({
     incorrect: incorrectLocalidade,
     correct: sugestion.value,
-  };
+  });
 
-  // deleteFirstIncorrectLocalidade()
+  if (insertedCorrectLocalidade.isFail()) {
+    return insertedCorrectLocalidade;
+  }
+
+  const deletedIncorrectLocalidade = await state
+    .deleteFirstIncorrectLocalidade();
+
+  if (deletedIncorrectLocalidade.isFail()) {
+    return Result.fail(Error("Failed to delete incorrect localidade"));
+  }
   return Result.done(undefined);
 }
 
+// deno-lint-ignore no-empty-interface
 interface UpdateLocalidadeLoopState extends UpdateLocalidadeState {
 }
 
@@ -154,16 +170,20 @@ async function updateLocalidadeLoop(
   state: UpdateLocalidadeControllerState,
 ) {
   while (true) {
-    await updateLocalidade(distritos, state);
+    const result = await updateLocalidade(distritos, state);
+    if (result.isFail()) {
+      return result;
+    }
   }
 }
 export interface UpdateLocalidadeControllerState
   extends UpdateLocalidadeLoopState {
   queryAllDistritos: QueryAllDistritos;
 }
+
 export async function UpdateLocalidadesController(
   state: UpdateLocalidadeControllerState,
 ) {
   const distritos = await state.queryAllDistritos();
-  updateLocalidadeLoop(distritos, state);
+  await updateLocalidadeLoop(distritos, state);
 }

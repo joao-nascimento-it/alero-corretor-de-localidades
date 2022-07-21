@@ -3,6 +3,7 @@ import { Result } from "@/kinds/Result.ts";
 import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
 import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
+  createDeleteFirstItem,
   createInsertItem,
   createQueryAllItems,
   createQueryFirstItem,
@@ -72,5 +73,15 @@ export function createInsertLocalidade<E>({
     safeReadJson,
     validate,
     safeWriteJson,
+  });
+}
+export function createDeleteFirstLocalidade<E>(state: {
+  path: string;
+  safeReadJson: SafeReadJson<E>;
+  safeWriteJson: SafeWriteJson<E>;
+}) {
+  return createDeleteFirstItem<Localidade, E | Error>({
+    ...state,
+    validate,
   });
 }

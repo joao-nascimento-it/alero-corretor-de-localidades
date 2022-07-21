@@ -2,10 +2,10 @@ import { queryFirstIncorrectLocalidade } from "@/repositories/IncorrectLocalidad
 import { queryAllDistritos } from "@/providers/DistritosProvider/index.ts";
 import { print } from "@/shared/print/index.ts";
 import { ask } from "@/shared/ask/index.ts";
-import { createUpdateLocalidadesController } from "./createUpdateLocalidades.controller.ts";
+import { UpdateLocalidadesController } from "./createUpdateLocalidades.controller.ts";
 
 export function updateLocalidadesController() {
-  return createUpdateLocalidadesController({
+  return UpdateLocalidadesController({
     queryFirstIncorrectLocalidade,
     queryAllDistritos,
     print,

@@ -8,7 +8,7 @@ import { Result } from "@/kinds/Result.ts";
 import { z } from "@/deps.ts";
 import { CorrectLocalidade } from "@/models/CorrectLocalidade.ts";
 
-const CORRECT_LOCALIDADES_FILE_PATH = "./private/incorretos.json";
+const CORRECT_LOCALIDADES_FILE_PATH = "./private/corretos.json";
 
 const LocalidadeSchema = z.object({
   municipio: z.string(),
