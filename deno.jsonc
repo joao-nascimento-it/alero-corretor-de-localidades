@@ -12,6 +12,7 @@
   "tasks": {
     "dev": "deno run --watch main.ts",
     "parse-raw": "deno run -A src/controllers/parseRawLocalidades/index.ts",
-    "update-localidade": "deno run -A src/controllers/updateLocalidade/index.ts"
+    "update-localidade": "deno run -A src/controllers/updateLocalidade/index.ts",
+    "create-database-script": "deno run -A src/controllers/parseToDatabase/index.ts"
   }
 }

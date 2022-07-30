@@ -2,6 +2,7 @@ import { safeReadJson } from "@/shared/safeReadJson/index.ts";
 import { safeWriteJson } from "@/shared/safeWriteJson/index.ts";
 import {
   createInsertItem,
+  createQueryAllItems,
   JsonRepositoryValidator,
 } from "../JsonRepository/createJsonRepository.ts";
 import { Result } from "@/kinds/Result.ts";
@@ -35,5 +36,11 @@ export const insertCorrectLocalidade = createInsertItem({
   path: CORRECT_LOCALIDADES_FILE_PATH,
   safeReadJson,
   safeWriteJson,
+  validate,
+});
+
+export const queryAllCorrectLocalidade = createQueryAllItems({
+  path: CORRECT_LOCALIDADES_FILE_PATH,
+  safeReadJson,
   validate,
 });

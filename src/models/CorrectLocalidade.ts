@@ -5,4 +5,4 @@ export type CorrectLocalidade = Readonly<{
   correct: Localidade;
 }>;
 
-export type CorrectLocalidades = ReadonlyArray<Localidade>;
+export type CorrectLocalidades = ReadonlyArray<CorrectLocalidade>;

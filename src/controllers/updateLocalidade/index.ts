@@ -25,4 +25,7 @@ export function updateLocalidadesController() {
   });
 }
 
-await updateLocalidadesController();
+const result = await updateLocalidadesController();
+if (result.isFail()) {
+  throw result.value;
+}

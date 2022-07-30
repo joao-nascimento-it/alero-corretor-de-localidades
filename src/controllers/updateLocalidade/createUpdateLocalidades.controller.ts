@@ -272,5 +272,5 @@ export async function UpdateLocalidadesController(
   state: UpdateLocalidadeControllerState,
 ) {
   const distritos = await state.queryAllDistritos();
-  await updateLocalidadeLoop(state, distritos);
+  return await updateLocalidadeLoop(state, distritos);
 }
