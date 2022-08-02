@@ -1,7 +1,7 @@
 import { assertEquals, z } from "@/deps.ts";
-import { Result } from "@/kinds/Result.ts";
-import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
-import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
+import { Result } from "@/pure/kinds/Result.ts";
+import { SafeReadJson } from "@/pure/shared/safeReadJson/ISafeReadJson.ts";
+import { SafeWriteJson } from "@/pure/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
   createDeleteFirstItem,
   createInsertItem,
@@ -81,31 +81,31 @@ class Fake<T> {
   static createFakeSafeWriteJson = <T>(
     database: Fake<T>,
   ): SafeWriteJson<never> =>
-    async (path, data) => {
-      await Promise.resolve();
-      assertEquals(path, "file.json");
-      database.array = data;
-      return Result.done(undefined);
-    };
+  async (path, data) => {
+    await Promise.resolve();
+    assertEquals(path, "file.json");
+    database.array = data;
+    return Result.done(undefined);
+  };
 
   static createFakeSafeReadJson = <T>(
     database: Fake<T>,
   ): SafeReadJson<never> =>
-    async (path) => {
-      await Promise.resolve();
-      assertEquals(path, "file.json");
-      return Result.done(database.array);
-    };
+  async (path) => {
+    await Promise.resolve();
+    assertEquals(path, "file.json");
+    return Result.done(database.array);
+  };
 
   static createFakeJsonRepositoryValidator = (): JsonRepositoryValidator<
     string,
     Error
   > =>
-    async (data) => {
-      const parsedData = await testSchema.safeParseAsync(data);
-      if (!parsedData.success) {
-        return Result.fail(parsedData.error);
-      }
-      return Result.done(parsedData.data);
-    };
+  async (data) => {
+    const parsedData = await testSchema.safeParseAsync(data);
+    if (!parsedData.success) {
+      return Result.fail(parsedData.error);
+    }
+    return Result.done(parsedData.data);
+  };
 }

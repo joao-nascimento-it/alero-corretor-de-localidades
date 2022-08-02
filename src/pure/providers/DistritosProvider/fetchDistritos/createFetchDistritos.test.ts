@@ -1,6 +1,6 @@
 import { assertEquals } from "@/deps.ts";
-import { Result } from "@/kinds/Result.ts";
-import { Distritos } from "@/models/Distrito.ts";
+import { Result } from "@/pure/kinds/Result.ts";
+import { Distritos } from "@/pure/models/Distrito.ts";
 import { createFetchDistritos } from "./createFetchDistritos.ts";
 
 Deno.test("createFetchDistritos should fetch distritos", async () => {

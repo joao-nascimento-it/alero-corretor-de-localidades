@@ -1,7 +1,7 @@
 import {
   CorrectLocalidade,
   CorrectLocalidades,
-} from "@/models/CorrectLocalidade.ts";
+} from "@/pure/models/CorrectLocalidade.ts";
 import { QueryAllCorrectLocalidade } from "../../repositories/CorrectLocalidadesRepository/CorrectLocalidadesRepository.ts";
 
 type CorrectRefinedLocalidade = Readonly<{

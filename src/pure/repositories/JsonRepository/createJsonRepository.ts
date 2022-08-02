@@ -1,6 +1,6 @@
-import { Result } from "@/kinds/Result.ts";
-import { SafeReadJson } from "@/shared/safeReadJson/ISafeReadJson.ts";
-import { SafeWriteJson } from "@/shared/safeWriteJson/ISafeWriteJson.ts";
+import { Result } from "@/pure/kinds/Result.ts";
+import { SafeReadJson } from "@/pure/shared/safeReadJson/ISafeReadJson.ts";
+import { SafeWriteJson } from "@/pure/shared/safeWriteJson/ISafeWriteJson.ts";
 import {
   DeleteFirstItem,
   InsertItem,
@@ -23,19 +23,19 @@ export const createQueryAllItems = <T, E>({
   safeReadJson,
   validate,
 }: CreateQueryAllItemsDeps<T, E>): QueryAllItems<T, E> =>
-  async (): Promise<Result<readonly T[], E>> => {
-    const data = await safeReadJson(path);
+async (): Promise<Result<readonly T[], E>> => {
+  const data = await safeReadJson(path);
 
-    if (data.isFail()) {
-      return Result.fail(data.value);
-    }
+  if (data.isFail()) {
+    return Result.fail(data.value);
+  }
 
-    const validatorResult = await validate(data.value);
+  const validatorResult = await validate(data.value);
 
-    if (validatorResult.isFail()) return validatorResult;
+  if (validatorResult.isFail()) return validatorResult;
 
-    return Result.done(validatorResult.value);
-  };
+  return Result.done(validatorResult.value);
+};
 
 interface CreateInsertItemDeps<T, E> {
   readonly path: string;
@@ -50,27 +50,27 @@ export const createInsertItem = <T, E>({
   safeWriteJson,
   validate,
 }: CreateInsertItemDeps<T, E>): InsertItem<T, E> =>
-  async (item) => {
-    const data = await safeReadJson(path);
-    if (data.isFail()) {
-      return Result.fail(data.value);
-    }
+async (item) => {
+  const data = await safeReadJson(path);
+  if (data.isFail()) {
+    return Result.fail(data.value);
+  }
 
-    const validatedResult = await validate(data.value);
+  const validatedResult = await validate(data.value);
 
-    if (validatedResult.isFail()) {
-      return validatedResult;
-    }
+  if (validatedResult.isFail()) {
+    return validatedResult;
+  }
 
-    const database = validatedResult.value;
+  const database = validatedResult.value;
 
-    const result = await safeWriteJson(path, [item, ...database]);
-    if (result.isFail()) {
-      return Result.fail(result.value);
-    }
+  const result = await safeWriteJson(path, [item, ...database]);
+  if (result.isFail()) {
+    return Result.fail(result.value);
+  }
 
-    return Result.done(item);
-  };
+  return Result.done(item);
+};
 
 interface CreateQueryFirstItemDeps<T, E> {
   path: string;
@@ -83,20 +83,20 @@ export const createQueryFirstItem = <T, E>({
   safeReadJson,
   validate,
 }: CreateQueryFirstItemDeps<T, E>): QueryFirstItem<T, E> =>
-  async () => {
-    const queryAllItems = createQueryAllItems<T, E>({
-      path,
-      safeReadJson,
-      validate,
-    });
+async () => {
+  const queryAllItems = createQueryAllItems<T, E>({
+    path,
+    safeReadJson,
+    validate,
+  });
 
-    const itemsResult = await queryAllItems();
-    if (itemsResult.isFail()) return itemsResult;
+  const itemsResult = await queryAllItems();
+  if (itemsResult.isFail()) return itemsResult;
 
-    const [head] = itemsResult.value;
+  const [head] = itemsResult.value;
 
-    return Result.done(head);
-  };
+  return Result.done(head);
+};
 
 interface CreateDeleteFirstItemDeps<T, E> {
   path: string;
@@ -111,16 +111,16 @@ export const createDeleteFirstItem = <T, E>({
   safeWriteJson,
   validate,
 }: CreateDeleteFirstItemDeps<T, E>): DeleteFirstItem<T, E> =>
-  async () => {
-    const queryAllItems = createQueryAllItems({ path, safeReadJson, validate });
+async () => {
+  const queryAllItems = createQueryAllItems({ path, safeReadJson, validate });
 
-    const itemsResult = await queryAllItems();
-    if (itemsResult.isFail()) return itemsResult;
+  const itemsResult = await queryAllItems();
+  if (itemsResult.isFail()) return itemsResult;
 
-    const [head, ...tail] = itemsResult.value;
+  const [head, ...tail] = itemsResult.value;
 
-    const result = await safeWriteJson(path, tail);
-    if (result.isFail()) return result;
+  const result = await safeWriteJson(path, tail);
+  if (result.isFail()) return result;
 
-    return Result.done(head);
-  };
+  return Result.done(head);
+};

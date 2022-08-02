@@ -1,20 +1,20 @@
 import { assertEquals } from "@/deps.ts";
-import { Result } from "@/kinds/Result.ts";
-import { CorrectLocalidade } from "@/models/CorrectLocalidade.ts";
-import { Distritos } from "@/models/Distrito.ts";
-import { Localidade } from "@/models/Localidade.ts";
+import { Result } from "@/pure/kinds/Result.ts";
+import { CorrectLocalidade } from "@/pure/models/CorrectLocalidade.ts";
+import { Distritos } from "@/pure/models/Distrito.ts";
+import { Localidade } from "@/pure/models/Localidade.ts";
 import {
   FindOneDistritoByMunicipioId,
   QueryAllDistritos,
-} from "@/providers/DistritosProvider/IDistritosProvider.ts";
-import { InsertCorrectLocalidade } from "@/repositories/CorrectLocalidadesRepository/CorrectLocalidadesRepository.ts";
+} from "@/pure/providers/DistritosProvider/IDistritosProvider.ts";
+import { InsertCorrectLocalidade } from "@/pure/repositories/CorrectLocalidadesRepository/CorrectLocalidadesRepository.ts";
 import {
   DeleteFirstIncorrectLocalidade,
   QueryFirstIncorrectLocalidade,
-} from "@/repositories/IncorrectLocalidadesRepository/IIncorrectLocalidadesRepository.ts";
-import { Ask } from "@/shared/ask/IAsk.ts";
-import { Print } from "@/shared/print/IPrint.ts";
-import { InsertIgnoredLocalidade } from "../../repositories/IgnoredLocalidadesRepository/IIgnoredLocalidadesRepository.ts";
+} from "@/pure/repositories/IncorrectLocalidadesRepository/IIncorrectLocalidadesRepository.ts";
+import { Ask } from "@/pure/shared/ask/IAsk.ts";
+import { Print } from "@/pure/shared/print/IPrint.ts";
+import { InsertIgnoredLocalidade } from "@/pure/repositories/IgnoredLocalidadesRepository/IIgnoredLocalidadesRepository.ts";
 import {
   UpdateLocalidadeControllerState,
   UpdateLocalidadesController,
