@@ -7,7 +7,9 @@ import { fetchDistritos } from "./fetchDistritos.ts";
 const databaseResult = await fetchDistritos();
 
 if (databaseResult.isFail()) {
-  throw new Error("Falha ao requisitar a lista de Distritos do IBGE");
+  throw new Error("Falha ao requisitar a lista de Distritos do IBGE", {
+    cause: databaseResult.value,
+  });
 }
 
 const database = databaseResult.value;

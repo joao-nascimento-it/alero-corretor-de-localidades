@@ -5,7 +5,7 @@ import { Distrito, Distritos } from "@/pure/models/Distrito.ts";
 const DistritosJsonResponseSchema = z.array(z.object({
   "distrito-id": z.number(),
   "distrito-nome": z.string(),
-  "municipio-id": z.string(),
+  "municipio-id": z.number(),
   "municipio-nome": z.string(),
   "UF-id": z.number(),
   "UF-sigla": z.string(),
@@ -38,7 +38,7 @@ export function createFetchDistritos({ fetch }: FetchDistritosDeps) {
       const mapped = distritosResult.data.map((item): Distrito => ({
         "distrito-id": item["distrito-id"].toFixed(),
         "distrito-nome": item["distrito-nome"],
-        "municipio-id": item["municipio-id"],
+        "municipio-id": item["municipio-id"].toFixed(),
         "municipio-nome": item["municipio-nome"],
         "UF-id": item["UF-id"].toFixed(),
         "UF-sigla": item["UF-sigla"],
