@@ -10,9 +10,10 @@
   },
   "importMap": "import_map.json",
   "tasks": {
-    "dev": "deno run --watch main.ts",
+    "dev": "deno run main.ts",
     "parse-raw": "deno run -A src/impure/views/parseRawLocalidades.ts",
     "update-localidade": "deno run -A src/impure/views/updateLocalidade.ts",
-    "create-database-script": "deno run -A src/impure/views/parseToDatabase.ts"
+    "create-database-script": "deno run -A src/impure/views/parseToDatabase.ts",
+    "test": "deno test src --parallel"
   }
 }
