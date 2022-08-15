@@ -1,5 +1,8 @@
 # validador-de-localidades
 
-Para iniciar insira o script: denon start
+Para iniciar insira um dos scripts
+    "parse-raw"
+    "update-localidade"
+    "create-database-script"
+    "test"
 
-Para testar, insira o comando: denon test
