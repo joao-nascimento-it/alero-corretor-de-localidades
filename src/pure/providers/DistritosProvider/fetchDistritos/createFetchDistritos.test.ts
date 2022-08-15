@@ -7,7 +7,7 @@ Deno.test("createFetchDistritos should fetch distritos", async () => {
   const distritosJsonBody = [{
     "distrito-id": 110020505,
     "distrito-nome": "Porto Velho",
-    "municipio-id": "1100205",
+    "municipio-id": 1100205,
     "municipio-nome": "Porto Velho",
     "UF-id": 11,
     "UF-sigla": "RO",
